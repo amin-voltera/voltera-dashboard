@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="nl">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -41,10 +41,7 @@
   /* Shared header */
   .header { margin-bottom: 40px; }
 
-  .logo {
-    margin-bottom: 24px;
-  }
-
+  .logo { margin-bottom: 24px; }
   .logo img {
     height: 32px;
     filter: brightness(0) invert(1);
@@ -102,7 +99,6 @@
   }
 
   .goal-label span { color: #999; font-weight: 500; }
-
   .revenue-display { margin-bottom: 50px; }
 
   .progress-container {
@@ -167,8 +163,8 @@
     margin-top: 4px;
   }
 
-  /* ====== SLIDE 2 — Distribution ====== */
-  .total-revenue {
+  /* ====== Distribution + Product slides ====== */
+  .big-total {
     font-size: 3.5rem;
     font-weight: 700;
     background: linear-gradient(135deg, #d8ec82, #00b67a);
@@ -202,11 +198,21 @@
     height: 3px;
   }
 
-  .category.batterij::before { background: linear-gradient(90deg, #d8ec82, #b8d462); }
-  .category.zonne::before { background: linear-gradient(90deg, #f5a623, #ffd700); }
-  .category.warmte::before { background: linear-gradient(90deg, #00b67a, #00d68f); }
+  /* Category colors */
+  .cat-batterij::before { background: linear-gradient(90deg, #d8ec82, #b8d462); }
+  .cat-zonne::before { background: linear-gradient(90deg, #f5a623, #ffd700); }
+  .cat-warmte::before { background: linear-gradient(90deg, #00b67a, #00d68f); }
 
-  .category-icon { font-size: 2.5rem; margin-bottom: 12px; }
+  /* Brand colors */
+  .brand-alphaess::before { background: linear-gradient(90deg, #3b82f6, #60a5fa); }
+  .brand-ecoflow::before { background: linear-gradient(90deg, #10b981, #34d399); }
+  .brand-jasolar::before { background: linear-gradient(90deg, #f5a623, #ffd700); }
+  .brand-remeha::before { background: linear-gradient(90deg, #ff6b6b, #ee5a24); }
+  .brand-intergas::before { background: linear-gradient(90deg, #00b67a, #00d68f); }
+  .brand-hisense::before { background: linear-gradient(90deg, #a78bfa, #7b61ff); }
+  .brand-solarwatt::before { background: linear-gradient(90deg, #e06030, #ff7844); }
+  .brand-sigenergy::before { background: linear-gradient(90deg, #a78bfa, #8b5cf6); }
+  .brand-enphase::before { background: linear-gradient(90deg, #eab308, #facc15); }
 
   .category-name {
     font-size: 1.1rem;
@@ -218,15 +224,25 @@
   }
 
   .category-pct {
-    font-size: 3.8rem;
+    font-size: 3.2rem;
     font-weight: 700;
     line-height: 1;
     margin-bottom: 8px;
   }
 
-  .batterij .category-pct { color: #d8ec82; }
-  .zonne .category-pct { color: #f5a623; }
-  .warmte .category-pct { color: #00b67a; }
+  .cat-batterij .category-pct { color: #d8ec82; }
+  .cat-zonne .category-pct { color: #f5a623; }
+  .cat-warmte .category-pct { color: #00b67a; }
+
+  .brand-alphaess .category-pct { color: #3b82f6; }
+  .brand-ecoflow .category-pct { color: #10b981; }
+  .brand-jasolar .category-pct { color: #f5a623; }
+  .brand-remeha .category-pct { color: #ff6b6b; }
+  .brand-intergas .category-pct { color: #00b67a; }
+  .brand-hisense .category-pct { color: #a78bfa; }
+  .brand-solarwatt .category-pct { color: #e06030; }
+  .brand-sigenergy .category-pct { color: #a78bfa; }
+  .brand-enphase .category-pct { color: #eab308; }
 
   .category-amount {
     font-size: 1.8rem;
@@ -249,9 +265,19 @@
     transition: width 1.5s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
-  .batterij .cat-bar { background: linear-gradient(90deg, #d8ec82, #b8d462); box-shadow: 0 0 15px rgba(216, 236, 130, 0.3); }
-  .zonne .cat-bar { background: linear-gradient(90deg, #f5a623, #ffd700); box-shadow: 0 0 15px rgba(245, 166, 35, 0.3); }
-  .warmte .cat-bar { background: linear-gradient(90deg, #00b67a, #00d68f); box-shadow: 0 0 15px rgba(0, 182, 122, 0.3); }
+  .cat-batterij .cat-bar { background: linear-gradient(90deg, #d8ec82, #b8d462); box-shadow: 0 0 15px rgba(216, 236, 130, 0.3); }
+  .cat-zonne .cat-bar { background: linear-gradient(90deg, #f5a623, #ffd700); box-shadow: 0 0 15px rgba(245, 166, 35, 0.3); }
+  .cat-warmte .cat-bar { background: linear-gradient(90deg, #00b67a, #00d68f); box-shadow: 0 0 15px rgba(0, 182, 122, 0.3); }
+
+  .brand-alphaess .cat-bar { background: linear-gradient(90deg, #3b82f6, #60a5fa); box-shadow: 0 0 15px rgba(59, 130, 246, 0.3); }
+  .brand-ecoflow .cat-bar { background: linear-gradient(90deg, #10b981, #34d399); box-shadow: 0 0 15px rgba(16, 185, 129, 0.3); }
+  .brand-jasolar .cat-bar { background: linear-gradient(90deg, #f5a623, #ffd700); box-shadow: 0 0 15px rgba(245, 166, 35, 0.3); }
+  .brand-remeha .cat-bar { background: linear-gradient(90deg, #ff6b6b, #ee5a24); box-shadow: 0 0 15px rgba(255, 107, 107, 0.3); }
+  .brand-intergas .cat-bar { background: linear-gradient(90deg, #00b67a, #00d68f); box-shadow: 0 0 15px rgba(0, 182, 122, 0.3); }
+  .brand-hisense .cat-bar { background: linear-gradient(90deg, #a78bfa, #7b61ff); box-shadow: 0 0 15px rgba(167, 139, 250, 0.3); }
+  .brand-solarwatt .cat-bar { background: linear-gradient(90deg, #e06030, #ff7844); box-shadow: 0 0 15px rgba(224, 96, 48, 0.3); }
+  .brand-sigenergy .cat-bar { background: linear-gradient(90deg, #a78bfa, #8b5cf6); box-shadow: 0 0 15px rgba(167, 139, 250, 0.3); }
+  .brand-enphase .cat-bar { background: linear-gradient(90deg, #eab308, #facc15); box-shadow: 0 0 15px rgba(234, 179, 8, 0.3); }
 
   .category-goal {
     font-size: 0.85rem;
@@ -289,6 +315,7 @@
     transform: translateX(-50%);
     display: flex;
     gap: 10px;
+    z-index: 100;
   }
 
   .dot {
@@ -296,6 +323,7 @@
     border-radius: 50%;
     background: #333;
     transition: all 0.4s ease;
+    cursor: pointer;
   }
 
   .dot.active {
@@ -308,7 +336,7 @@
 <body>
 
 <!-- SLIDE 1 — Revenue Goal -->
-<div class="slide active" id="slide1">
+<div class="slide active" id="slide-revenue">
   <div class="container">
     <div class="header">
       <div class="logo"><img src="https://voltera.nl/voltera-logo.png" alt="Voltera"></div>
@@ -316,27 +344,23 @@
       <h2>March 2026</h2>
     </div>
     <div class="revenue-display">
-      <div class="current-revenue" id="revenue">€12.000.000</div>
-      <div class="goal-label">Target: <span>€20.000.000</span></div>
+      <div class="current-revenue" id="revenue">-</div>
+      <div class="goal-label">Target: <span>€26,000,000</span></div>
     </div>
-    <div class="percentage" id="percentage">60,0%</div>
+    <div class="percentage" id="percentage">-</div>
     <div class="progress-container">
-      <div class="progress-bar" id="progressBar" style="width: 60%"></div>
+      <div class="progress-bar" id="progressBar" style="width: 0%"></div>
     </div>
     <div class="progress-labels">
-      <span>€0</span>
-      <span>€5M</span>
-      <span>€10M</span>
-      <span>€15M</span>
-      <span>€20M</span>
+      <span>€0</span><span>€6.5M</span><span>€13M</span><span>€19.5M</span><span>€26M</span>
     </div>
     <div class="stats">
       <div class="stat">
-        <div class="stat-value" id="remaining">€8.000.000</div>
+        <div class="stat-value" id="remaining">-</div>
         <div class="stat-label">Remaining</div>
       </div>
       <div class="stat">
-        <div class="stat-value" id="today">€0</div>
+        <div class="stat-value" id="today">-</div>
         <div class="stat-label">Today's Revenue</div>
       </div>
     </div>
@@ -344,70 +368,204 @@
 </div>
 
 <!-- SLIDE 2 — Distribution -->
-<div class="slide" id="slide2">
+<div class="slide" id="slide-distribution">
   <div class="container">
     <div class="header">
       <div class="logo"><img src="https://voltera.nl/voltera-logo.png" alt="Voltera"></div>
       <h1>Revenue Distribution <span class="pulse-dot"></span></h1>
       <h2>March 2026</h2>
     </div>
-    <div class="total-revenue" id="totalRevenue">€12.000.000</div>
+    <div class="big-total" id="distTotal">-</div>
     <div class="categories">
-      <div class="category batterij">
-        <div class="category-icon">&#x1F50B;</div>
-        <div class="category-name">Thuisbatterij</div>
-        <div class="category-pct">65%</div>
-        <div class="category-amount" id="amountBatterij">€7.800.000</div>
-        <div class="cat-bar-container">
-          <div class="cat-bar" id="barBatterij" style="width: 60%"></div>
-        </div>
-        <div class="category-goal">Target: <span id="goalBatterij">€13.000.000</span></div>
+      <div class="category cat-batterij">
+        <div class="category-name">Home Batteries</div>
+        <div class="category-pct" id="pctBatterij">-</div>
+        <div class="category-amount" id="amtBatterij">-</div>
+        <div class="cat-bar-container"><div class="cat-bar" id="barBatterij" style="width:0%"></div></div>
+        <div class="category-goal">Target: <span id="goalBatterij">-</span></div>
       </div>
-      <div class="category zonne">
-        <div class="category-icon">&#x2600;&#xFE0F;</div>
-        <div class="category-name">Zonnepanelen</div>
-        <div class="category-pct">15%</div>
-        <div class="category-amount" id="amountZonne">€1.800.000</div>
-        <div class="cat-bar-container">
-          <div class="cat-bar" id="barZonne" style="width: 60%"></div>
-        </div>
-        <div class="category-goal">Target: <span id="goalZonne">€3.000.000</span></div>
+      <div class="category cat-zonne">
+        <div class="category-name">Solar Panels</div>
+        <div class="category-pct" id="pctZonne">-</div>
+        <div class="category-amount" id="amtZonne">-</div>
+        <div class="cat-bar-container"><div class="cat-bar" id="barZonne" style="width:0%"></div></div>
+        <div class="category-goal">Target: <span id="goalZonne">-</span></div>
       </div>
-      <div class="category warmte">
-        <div class="category-icon">&#x1F525;</div>
-        <div class="category-name">Hybride Warmtepompen</div>
-        <div class="category-pct">20%</div>
-        <div class="category-amount" id="amountWarmte">€2.400.000</div>
-        <div class="cat-bar-container">
-          <div class="cat-bar" id="barWarmte" style="width: 60%"></div>
-        </div>
-        <div class="category-goal">Target: <span id="goalWarmte">€4.000.000</span></div>
+      <div class="category cat-warmte">
+        <div class="category-name">Hybrid Heat Pumps</div>
+        <div class="category-pct" id="pctWarmte">-</div>
+        <div class="category-amount" id="amtWarmte">-</div>
+        <div class="cat-bar-container"><div class="cat-bar" id="barWarmte" style="width:0%"></div></div>
+        <div class="category-goal">Target: <span id="goalWarmte">-</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 3 — Home Batteries by brand -->
+<div class="slide" id="slide-batterij">
+  <div class="container">
+    <div class="header">
+      <div class="logo"><img src="https://voltera.nl/voltera-logo.png" alt="Voltera"></div>
+      <h1>Home Batteries <span class="pulse-dot"></span></h1>
+      <h2>Revenue per Brand</h2>
+    </div>
+    <div class="big-total" id="batTotal">-</div>
+    <div class="categories">
+      <div class="category brand-alphaess">
+        <div class="category-name">AlphaESS</div>
+        <div class="category-pct" id="pctAlphaess">-</div>
+        <div class="category-amount" id="amtAlphaess">-</div>
+        <div class="cat-bar-container"><div class="cat-bar" id="barAlphaess" style="width:0%"></div></div>
+      </div>
+      <div class="category brand-ecoflow">
+        <div class="category-name">EcoFlow</div>
+        <div class="category-pct" id="pctEcoflow">-</div>
+        <div class="category-amount" id="amtEcoflow">-</div>
+        <div class="cat-bar-container"><div class="cat-bar" id="barEcoflow" style="width:0%"></div></div>
+      </div>
+      <div class="category brand-solarwatt">
+        <div class="category-name">Solarwatt</div>
+        <div class="category-pct" id="pctSolarwatt">-</div>
+        <div class="category-amount" id="amtSolarwatt">-</div>
+        <div class="cat-bar-container"><div class="cat-bar" id="barSolarwatt" style="width:0%"></div></div>
+      </div>
+      <div class="category brand-sigenergy">
+        <div class="category-name">Sigenergy</div>
+        <div class="category-pct" id="pctSigenergy">-</div>
+        <div class="category-amount" id="amtSigenergy">-</div>
+        <div class="cat-bar-container"><div class="cat-bar" id="barSigenergy" style="width:0%"></div></div>
+      </div>
+      <div class="category brand-enphase">
+        <div class="category-name">Enphase</div>
+        <div class="category-pct" id="pctEnphase">-</div>
+        <div class="category-amount" id="amtEnphase">-</div>
+        <div class="cat-bar-container"><div class="cat-bar" id="barEnphase" style="width:0%"></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 4 — Solar Panels by brand -->
+<div class="slide" id="slide-zonne">
+  <div class="container">
+    <div class="header">
+      <div class="logo"><img src="https://voltera.nl/voltera-logo.png" alt="Voltera"></div>
+      <h1>Solar Panels <span class="pulse-dot"></span></h1>
+      <h2>Revenue per Brand</h2>
+    </div>
+    <div class="big-total" id="zonTotal">-</div>
+    <div class="categories">
+      <div class="category brand-jasolar">
+        <div class="category-name">JA Solar</div>
+        <div class="category-pct" id="pctJasolar">-</div>
+        <div class="category-amount" id="amtJasolar">-</div>
+        <div class="cat-bar-container"><div class="cat-bar" id="barJasolar" style="width:0%"></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 5 — Warmtepompen by brand -->
+<div class="slide" id="slide-warmte">
+  <div class="container">
+    <div class="header">
+      <div class="logo"><img src="https://voltera.nl/voltera-logo.png" alt="Voltera"></div>
+      <h1>Hybrid Heat Pumps <span class="pulse-dot"></span></h1>
+      <h2>Revenue per Brand</h2>
+    </div>
+    <div class="big-total" id="wpTotal">-</div>
+    <div class="categories">
+      <div class="category brand-remeha">
+        <div class="category-name">Remeha</div>
+        <div class="category-pct" id="pctRemeha">-</div>
+        <div class="category-amount" id="amtRemeha">-</div>
+        <div class="cat-bar-container"><div class="cat-bar" id="barRemeha" style="width:0%"></div></div>
+      </div>
+      <div class="category brand-intergas">
+        <div class="category-name">Intergas</div>
+        <div class="category-pct" id="pctIntergas">-</div>
+        <div class="category-amount" id="amtIntergas">-</div>
+        <div class="cat-bar-container"><div class="cat-bar" id="barIntergas" style="width:0%"></div></div>
+      </div>
+      <div class="category brand-hisense">
+        <div class="category-name">Hisense</div>
+        <div class="category-pct" id="pctHisense">-</div>
+        <div class="category-amount" id="amtHisense">-</div>
+        <div class="cat-bar-container"><div class="cat-bar" id="barHisense" style="width:0%"></div></div>
       </div>
     </div>
   </div>
 </div>
 
 <!-- Slide indicators -->
-<div class="indicators">
-  <div class="dot active" id="dot0"></div>
-  <div class="dot" id="dot1"></div>
-</div>
+<div class="indicators" id="indicators"></div>
 
 <script>
-  // === Deterministic revenue engine ===
-  const GOAL = 20_000_000;
+  // === Config ===
+  const GOAL = 26_000_000;
   const START = 11_847_362;
-  const INCREMENT_MIN = 6_000;
-  const INCREMENT_MAX = 15_000;
-  const INTERVAL_MS = 45 * 1000; // every 45 seconds
-  const SPLITS = { batterij: 0.65, zonne: 0.15, warmte: 0.20 };
-  const GOALS = {
-    batterij: GOAL * SPLITS.batterij,
-    zonne: GOAL * SPLITS.zonne,
-    warmte: GOAL * SPLITS.warmte,
+  // ~12 sales/hour at avg ~€8.3k = ~€100k/hour → 1 sale every 5 min
+  const INTERVAL_MS = 5 * 60 * 1000;
+
+  // Product catalog from CSV (exact selling prices)
+  const PRODUCTS = [
+    // AlphaESS — batteries (60% of all sales)
+    { brand: 'alphaess', cat: 'batterij', name: 'AlphaESS 11.4 kWh 5kW 1-fase', price: 7500 },
+    { brand: 'alphaess', cat: 'batterij', name: 'AlphaESS 11.4 kWh 10kW 3-fase', price: 8500 },
+    { brand: 'alphaess', cat: 'batterij', name: 'AlphaESS 15.2 kWh 10kW 3-fase', price: 9250 },
+    { brand: 'alphaess', cat: 'batterij', name: 'AlphaESS 15.2 kWh 5kW 1-fase', price: 8800 },
+    { brand: 'alphaess', cat: 'batterij', name: 'AlphaESS 19 kWh 10kW 3-fase', price: 9850 },
+    { brand: 'alphaess', cat: 'batterij', name: 'AlphaESS 22.8 kWh 10kW 3-fase', price: 10500 },
+    { brand: 'alphaess', cat: 'batterij', name: 'AlphaESS 30.4 kWh 10kW 3-fase', price: 15400 },
+    { brand: 'alphaess', cat: 'batterij', name: 'AlphaESS 38 kWh 10kW 3-fase', price: 18500 },
+    { brand: 'alphaess', cat: 'batterij', name: 'AlphaESS 45.6 kWh 10kW 3-fase', price: 22000 },
+    { brand: 'alphaess', cat: 'batterij', name: 'Alpha ESS 9.3 kWh 1-fase', price: 7000 },
+    { brand: 'alphaess', cat: 'batterij', name: 'Alpha ESS 9.3 kWh 3-fase', price: 8000 },
+    { brand: 'alphaess', cat: 'batterij', name: 'Alpha ESS 18.6 kWh 3-fase', price: 9700 },
+    { brand: 'alphaess', cat: 'batterij', name: 'Alpha ESS 27.9 kWh 3-fase', price: 11500 },
+    { brand: 'alphaess', cat: 'batterij', name: 'Alpha ESS 37.2 kWh 3-fase', price: 13300 },
+    { brand: 'alphaess', cat: 'batterij', name: 'Alpha ESS 46.5 kWh 3-fase', price: 14800 },
+    { brand: 'alphaess', cat: 'batterij', name: 'Alpha ESS Laadpaal', price: 1000 },
+    { brand: 'alphaess', cat: 'batterij', name: 'Alpha ESS Back-up Box', price: 2000 },
+    // EcoFlow — batteries
+    { brand: 'ecoflow', cat: 'batterij', name: 'EcoFlow Stream Pro 1.92kWh', price: 1600 },
+    { brand: 'ecoflow', cat: 'batterij', name: 'EcoFlow Stream UltraX 3.84kWh', price: 1900 },
+    // Solarwatt — batteries
+    { brand: 'solarwatt', cat: 'batterij', name: 'Solarwatt Battery Vision 7.2 kWh', price: 8500 },
+    { brand: 'solarwatt', cat: 'batterij', name: 'Solarwatt Battery Vision 14.4 kWh', price: 14200 },
+    // Sigenergy — batteries
+    { brand: 'sigenergy', cat: 'batterij', name: 'Sigenergy SigenStor 5 kWh', price: 6800 },
+    { brand: 'sigenergy', cat: 'batterij', name: 'Sigenergy SigenStor 10 kWh', price: 11500 },
+    // Enphase — batteries
+    { brand: 'enphase', cat: 'batterij', name: 'Enphase IQ Battery 5P', price: 7200 },
+    { brand: 'enphase', cat: 'batterij', name: 'Enphase IQ Battery 10T', price: 12800 },
+    // JA Solar — solar panels
+    { brand: 'jasolar', cat: 'zonne', name: 'JA Solar 455W JAM54D41-455/LB', price: 745 },
+    { brand: 'jasolar', cat: 'zonne', name: 'JA Solar 450W JAM54D41-450/LB', price: 745 },
+    { brand: 'jasolar', cat: 'zonne', name: 'JA Solar 455W DC-gekoppeld', price: 645 },
+    // Remeha — heat pumps
+    { brand: 'remeha', cat: 'warmte', name: 'Remeha Elga Ace 4 kW', price: 7700 },
+    { brand: 'remeha', cat: 'warmte', name: 'Remeha Elga Ace 6 kW', price: 8200 },
+    { brand: 'remeha', cat: 'warmte', name: 'Remeha Avanta 35C ketel', price: 3300 },
+    // Intergas — heat pumps
+    { brand: 'intergas', cat: 'warmte', name: 'Intergas Xtend 5 kW', price: 7850 },
+    { brand: 'intergas', cat: 'warmte', name: 'Intergas HReco combi-ketel', price: 3300 },
+    // Hisense — heat pumps
+    { brand: 'hisense', cat: 'warmte', name: 'Hisense Hi-Hybrid R290', price: 7950 },
+  ];
+
+  // Split products by brand for selection
+  const ALPHAESS_PRODUCTS = PRODUCTS.filter(p => p.brand === 'alphaess');
+  const OTHER_PRODUCTS = PRODUCTS.filter(p => p.brand !== 'alphaess');
+
+  const CAT_GOALS = {
+    batterij: GOAL * 0.65,
+    zonne: GOAL * 0.15,
+    warmte: GOAL * 0.20,
   };
 
-  // Persist start time so revenue stays consistent across reloads
+  // === Deterministic PRNG ===
   let REF = parseInt(localStorage.getItem('voltera_dash_ref'));
   if (!REF || isNaN(REF)) {
     REF = Date.now();
@@ -423,115 +581,219 @@
     };
   }
 
-  function getRevenue() {
+  function pickProduct(rng) {
+    // 60% AlphaESS, 40% other brands
+    if (rng() < 0.60) {
+      return ALPHAESS_PRODUCTS[Math.floor(rng() * ALPHAESS_PRODUCTS.length)];
+    } else {
+      return OTHER_PRODUCTS[Math.floor(rng() * OTHER_PRODUCTS.length)];
+    }
+  }
+
+  function getState() {
     const elapsed = Date.now() - REF;
     const intervals = Math.floor(elapsed / INTERVAL_MS);
-    let revenue = START;
-    let todayRev = 0;
-    for (let i = 0; i < intervals; i++) {
-      const rng = mulberry32(i + 42)();
-      const inc = Math.floor(rng * (INCREMENT_MAX - INCREMENT_MIN + 1)) + INCREMENT_MIN;
-      revenue += inc;
-      todayRev += inc;
+
+    // Accumulators
+    const cats = { batterij: 0, zonne: 0, warmte: 0 };
+    const brands = {
+      alphaess: 0, ecoflow: 0, solarwatt: 0, sigenergy: 0, enphase: 0,
+      jasolar: 0,
+      remeha: 0, intergas: 0, hisense: 0,
+    };
+
+    // Starting distribution (seeded, deterministic)
+    const startRng = mulberry32(999);
+    // Simulate ~1,100 past sales to build up to START
+    let accumulated = 0;
+    while (accumulated < START) {
+      const product = pickProduct(startRng);
+      const price = product.price;
+      if (accumulated + price > START + 25000) break;
+      cats[product.cat] += price;
+      brands[product.brand] += price;
+      accumulated += price;
     }
-    return { revenue, todayRev, intervals };
+    // Scale to exactly match START
+    const scale = START / (accumulated || 1);
+    for (const c of Object.keys(cats)) cats[c] *= scale;
+    for (const b of Object.keys(brands)) brands[b] *= scale;
+
+    let todayRev = 0;
+    let lastProduct = null;
+    for (let i = 0; i < intervals; i++) {
+      const rng = mulberry32(i + 42);
+      const product = pickProduct(rng);
+      const price = product.price;
+      todayRev += price;
+      cats[product.cat] += price;
+      brands[product.brand] += price;
+      lastProduct = product;
+    }
+
+    const revenue = Object.values(cats).reduce((a, b) => a + b, 0);
+    return { revenue, todayRev, intervals, cats, brands, lastProduct };
   }
 
   function formatEuro(n) {
-    return '€' + Math.round(n).toLocaleString('nl-NL');
+    return '€' + Math.round(n).toLocaleString('en-US');
+  }
+
+  function pctStr(part, total) {
+    if (total === 0) return '0%';
+    return (part / total * 100).toFixed(1) + '%';
   }
 
   // === Counting animation ===
   const activeAnimations = new Map();
 
   function animateCount(el, from, to, duration = 2500) {
-    // Cancel any running animation on this element
     if (activeAnimations.has(el)) cancelAnimationFrame(activeAnimations.get(el));
-
     const start = performance.now();
     function tick(now) {
       const t = Math.min((now - start) / duration, 1);
-      // Ease out cubic
       const eased = 1 - Math.pow(1 - t, 3);
-      const current = from + (to - from) * eased;
-      el.textContent = formatEuro(current);
-      if (t < 1) {
-        activeAnimations.set(el, requestAnimationFrame(tick));
-      } else {
-        activeAnimations.delete(el);
-      }
+      el.textContent = formatEuro(from + (to - from) * eased);
+      if (t < 1) activeAnimations.set(el, requestAnimationFrame(tick));
+      else activeAnimations.delete(el);
     }
     activeAnimations.set(el, requestAnimationFrame(tick));
   }
 
-  // === Track previous values for counting ===
-  let prevRevenue = START;
-  let prevTodayRev = 0;
-  let prevCatAmounts = { batterij: START * 0.65, zonne: START * 0.15, warmte: START * 0.20 };
+  function animatePct(el, fromPart, fromTotal, toPart, toTotal, duration = 2500) {
+    if (activeAnimations.has(el)) cancelAnimationFrame(activeAnimations.get(el));
+    const start = performance.now();
+    function tick(now) {
+      const t = Math.min((now - start) / duration, 1);
+      const eased = 1 - Math.pow(1 - t, 3);
+      const p = fromPart + (toPart - fromPart) * eased;
+      const tot = fromTotal + (toTotal - fromTotal) * eased;
+      el.textContent = pctStr(p, tot);
+      if (t < 1) activeAnimations.set(el, requestAnimationFrame(tick));
+      else activeAnimations.delete(el);
+    }
+    activeAnimations.set(el, requestAnimationFrame(tick));
+  }
 
-  // === Update both slides ===
+  // === Previous state for animation ===
+  let prev = null;
   let prevIntervals = -1;
+  let animating = false;
+
+  function setVal(id, text) { document.getElementById(id).textContent = text; }
+  function setBar(id, pct) { document.getElementById(id).style.width = Math.min(pct, 100) + '%'; }
 
   function updateAll() {
-    const { revenue, todayRev, intervals } = getRevenue();
-    const pct = (revenue / GOAL) * 100;
+    const state = getState();
+    const { revenue, todayRev, intervals, cats, brands } = state;
     const isNew = prevIntervals >= 0 && intervals > prevIntervals;
     prevIntervals = intervals;
 
-    if (isNew) {
+    const pct = (revenue / GOAL) * 100;
+
+    if (isNew && prev) {
       animating = true;
       setTimeout(() => { animating = false; }, 2700);
 
-      // Slide 1 — animate counting
-      animateCount(document.getElementById('revenue'), prevRevenue, revenue);
-      animateCount(document.getElementById('remaining'), Math.max(GOAL - prevRevenue, 0), Math.max(GOAL - revenue, 0));
-      animateCount(document.getElementById('today'), prevTodayRev, todayRev);
+      // Slide 1
+      animateCount(document.getElementById('revenue'), prev.revenue, revenue);
+      animateCount(document.getElementById('remaining'), Math.max(GOAL - prev.revenue, 0), Math.max(GOAL - revenue, 0));
+      animateCount(document.getElementById('today'), prev.todayRev, todayRev);
 
-      // Slide 2 — animate counting
-      animateCount(document.getElementById('totalRevenue'), prevRevenue, revenue);
-      for (const [key, split] of Object.entries(SPLITS)) {
-        const amount = revenue * split;
-        const cap = key.charAt(0).toUpperCase() + key.slice(1);
-        animateCount(document.getElementById('amount' + cap), prevCatAmounts[key], amount);
+      // Slide 2
+      animateCount(document.getElementById('distTotal'), prev.revenue, revenue);
+      for (const c of ['batterij', 'zonne', 'warmte']) {
+        const cap = c.charAt(0).toUpperCase() + c.slice(1);
+        animateCount(document.getElementById('amt' + cap), prev.cats[c], cats[c]);
+        animatePct(document.getElementById('pct' + cap), prev.cats[c], prev.revenue, cats[c], revenue);
       }
 
-      // Popup
-      const rng = mulberry32(intervals - 1 + 42)();
-      const inc = Math.floor(rng * (INCREMENT_MAX - INCREMENT_MIN + 1)) + INCREMENT_MIN;
-      showPopup(inc);
+      // Slide 3 - Batterij brands
+      animateCount(document.getElementById('batTotal'), prev.cats.batterij, cats.batterij);
+      for (const b of ['alphaess', 'ecoflow', 'solarwatt', 'sigenergy', 'enphase']) {
+        const cap = b.charAt(0).toUpperCase() + b.slice(1);
+        animateCount(document.getElementById('amt' + cap), prev.brands[b], brands[b]);
+        animatePct(document.getElementById('pct' + cap), prev.brands[b], prev.cats.batterij, brands[b], cats.batterij);
+      }
+
+      // Slide 4 - Zonne brands
+      animateCount(document.getElementById('zonTotal'), prev.cats.zonne, cats.zonne);
+      animateCount(document.getElementById('amtJasolar'), prev.brands.jasolar, brands.jasolar);
+      animatePct(document.getElementById('pctJasolar'), prev.brands.jasolar, prev.cats.zonne, brands.jasolar, cats.zonne);
+
+      // Slide 5 - Warmte brands
+      animateCount(document.getElementById('wpTotal'), prev.cats.warmte, cats.warmte);
+      for (const b of ['remeha', 'intergas', 'hisense']) {
+        const cap = b.charAt(0).toUpperCase() + b.slice(1);
+        animateCount(document.getElementById('amt' + cap), prev.brands[b], brands[b]);
+        animatePct(document.getElementById('pct' + cap), prev.brands[b], prev.cats.warmte, brands[b], cats.warmte);
+      }
+
+      // Popup — show the product that was just sold
+      if (state.lastProduct) {
+        showPopup(state.lastProduct.price, state.lastProduct.name);
+      }
     } else {
-      // Static set (initial load, no animation needed)
-      document.getElementById('revenue').textContent = formatEuro(revenue);
-      document.getElementById('remaining').textContent = formatEuro(Math.max(GOAL - revenue, 0));
-      document.getElementById('today').textContent = formatEuro(todayRev);
-      document.getElementById('totalRevenue').textContent = formatEuro(revenue);
-      for (const [key, split] of Object.entries(SPLITS)) {
-        const cap = key.charAt(0).toUpperCase() + key.slice(1);
-        document.getElementById('amount' + cap).textContent = formatEuro(revenue * split);
+      // Static set
+      setVal('revenue', formatEuro(revenue));
+      setVal('remaining', formatEuro(Math.max(GOAL - revenue, 0)));
+      setVal('today', formatEuro(todayRev));
+      setVal('distTotal', formatEuro(revenue));
+
+      for (const c of ['batterij', 'zonne', 'warmte']) {
+        const cap = c.charAt(0).toUpperCase() + c.slice(1);
+        setVal('amt' + cap, formatEuro(cats[c]));
+        setVal('pct' + cap, pctStr(cats[c], revenue));
+      }
+
+      setVal('batTotal', formatEuro(cats.batterij));
+      for (const b of ['alphaess', 'ecoflow', 'solarwatt', 'sigenergy', 'enphase']) {
+        const cap = b.charAt(0).toUpperCase() + b.slice(1);
+        setVal('amt' + cap, formatEuro(brands[b]));
+        setVal('pct' + cap, pctStr(brands[b], cats.batterij));
+      }
+
+      setVal('zonTotal', formatEuro(cats.zonne));
+      setVal('amtJasolar', formatEuro(brands.jasolar));
+      setVal('pctJasolar', pctStr(brands.jasolar, cats.zonne));
+
+      setVal('wpTotal', formatEuro(cats.warmte));
+      for (const b of ['remeha', 'intergas', 'hisense']) {
+        const cap = b.charAt(0).toUpperCase() + b.slice(1);
+        setVal('amt' + cap, formatEuro(brands[b]));
+        setVal('pct' + cap, pctStr(brands[b], cats.warmte));
       }
     }
 
-    // Always update non-counting elements
-    document.getElementById('percentage').textContent = pct.toFixed(1).replace('.', ',') + '%';
-    document.getElementById('progressBar').style.width = Math.min(pct, 100) + '%';
-    for (const [key, split] of Object.entries(SPLITS)) {
-      const amount = revenue * split;
-      const goal = GOALS[key];
-      const barPct = Math.min((amount / goal) * 100, 100);
-      const cap = key.charAt(0).toUpperCase() + key.slice(1);
-      document.getElementById('bar' + cap).style.width = barPct + '%';
-      document.getElementById('goal' + cap).textContent = formatEuro(goal);
+    // Always update bars + percentage
+    setVal('percentage', pctStr(revenue, GOAL));
+    setBar('progressBar', pct);
+
+    for (const c of ['batterij', 'zonne', 'warmte']) {
+      const cap = c.charAt(0).toUpperCase() + c.slice(1);
+      setBar('bar' + cap, (cats[c] / CAT_GOALS[c]) * 100);
+      setVal('goal' + cap, formatEuro(CAT_GOALS[c]));
     }
 
-    // Store previous values
-    prevRevenue = revenue;
-    prevTodayRev = todayRev;
-    for (const [key, split] of Object.entries(SPLITS)) {
-      prevCatAmounts[key] = revenue * split;
+    // Brand bars (share within category)
+    const batBrands = ['alphaess', 'ecoflow', 'solarwatt', 'sigenergy', 'enphase'];
+    const maxBat = Math.max(...batBrands.map(b => brands[b]));
+    for (const b of batBrands) {
+      const cap = b.charAt(0).toUpperCase() + b.slice(1);
+      setBar('bar' + cap, maxBat ? (brands[b] / maxBat) * 100 : 0);
     }
+
+    setBar('barJasolar', 100);
+
+    const maxWp = Math.max(brands.remeha, brands.intergas, brands.hisense);
+    setBar('barRemeha', maxWp ? (brands.remeha / maxWp) * 100 : 0);
+    setBar('barIntergas', maxWp ? (brands.intergas / maxWp) * 100 : 0);
+    setBar('barHisense', maxWp ? (brands.hisense / maxWp) * 100 : 0);
+
+    prev = { revenue, todayRev, cats: { ...cats }, brands: { ...brands } };
   }
 
-  function showPopup(amount) {
+  function showPopup(amount, name) {
     const popup = document.createElement('div');
     popup.className = 'increment-popup';
     popup.textContent = '+' + formatEuro(amount);
@@ -546,23 +808,37 @@
     setTimeout(() => popup.remove(), 1500);
   }
 
-  // === Slide switcher (15 seconds, pauses during animation) ===
+  // === Slide switcher ===
+  const slideIds = ['slide-revenue', 'slide-distribution', 'slide-batterij', 'slide-zonne', 'slide-warmte'];
+  const slideEls = slideIds.map(id => document.getElementById(id));
   let currentSlide = 0;
-  let animating = false;
-  const slides = [document.getElementById('slide1'), document.getElementById('slide2')];
-  const dots = [document.getElementById('dot0'), document.getElementById('dot1')];
+
+  // Build indicators
+  const indContainer = document.getElementById('indicators');
+  slideIds.forEach((_, i) => {
+    const d = document.createElement('div');
+    d.className = 'dot' + (i === 0 ? ' active' : '');
+    d.id = 'dot' + i;
+    d.addEventListener('click', () => goToSlide(i));
+    indContainer.appendChild(d);
+  });
+
+  function goToSlide(i) {
+    if (i === currentSlide) return;
+    document.getElementById('dot' + currentSlide).classList.remove('active');
+    slideEls[currentSlide].classList.remove('active');
+    currentSlide = i;
+    slideEls[currentSlide].classList.add('active');
+    document.getElementById('dot' + currentSlide).classList.add('active');
+  }
 
   function switchSlide() {
     if (animating) return;
-    slides[currentSlide].classList.remove('active');
-    dots[currentSlide].classList.remove('active');
-    currentSlide = (currentSlide + 1) % slides.length;
-    slides[currentSlide].classList.add('active');
-    dots[currentSlide].classList.add('active');
+    goToSlide((currentSlide + 1) % slideEls.length);
   }
 
   updateAll();
-  setInterval(updateAll, 10_000);
+  setInterval(updateAll, 5_000);
   setInterval(switchSlide, 15_000);
 </script>
 
