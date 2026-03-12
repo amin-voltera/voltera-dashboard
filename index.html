@@ -602,19 +602,16 @@
       remeha: 0, intergas: 0, hisense: 0,
     };
 
-    // Starting distribution (seeded, deterministic)
+    // Starting distribution — even across all brands, pick random products uniformly
     const startRng = mulberry32(999);
-    // Simulate ~1,100 past sales to build up to START
     let accumulated = 0;
     while (accumulated < START) {
-      const product = pickProduct(startRng);
-      const price = product.price;
-      if (accumulated + price > START + 25000) break;
-      cats[product.cat] += price;
-      brands[product.brand] += price;
-      accumulated += price;
+      const product = PRODUCTS[Math.floor(startRng() * PRODUCTS.length)];
+      if (accumulated + product.price > START + 25000) break;
+      cats[product.cat] += product.price;
+      brands[product.brand] += product.price;
+      accumulated += product.price;
     }
-    // Scale to exactly match START
     const scale = START / (accumulated || 1);
     for (const c of Object.keys(cats)) cats[c] *= scale;
     for (const b of Object.keys(brands)) brands[b] *= scale;
