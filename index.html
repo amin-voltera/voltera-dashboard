@@ -4,17 +4,71 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Voltera - Sales Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
+  :root {
+    --lime: #d8ec82;
+    --lime-dim: rgba(216, 236, 130, 0.15);
+    --green: #00b67a;
+    --bg: #060608;
+    --surface: rgba(255, 255, 255, 0.03);
+    --surface-border: rgba(255, 255, 255, 0.06);
+    --surface-hover: rgba(255, 255, 255, 0.05);
+    --text-primary: #f0f0f0;
+    --text-secondary: rgba(255, 255, 255, 0.4);
+    --text-tertiary: rgba(255, 255, 255, 0.2);
+    --blue: #3b82f6;
+    --emerald: #10b981;
+    --orange: #e06030;
+    --violet: #a78bfa;
+    --amber: #eab308;
+    --gold: #f5a623;
+    --red: #ff6b6b;
+    --teal: #00b67a;
+    --purple: #a78bfa;
+    --font-display: 'Outfit', sans-serif;
+    --font-body: 'Plus Jakarta Sans', sans-serif;
+  }
+
   * { margin: 0; padding: 0; box-sizing: border-box; }
 
   body {
-    background: #0a0a0a;
-    color: #fff;
-    font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+    background: var(--bg);
+    color: var(--text-primary);
+    font-family: var(--font-body);
     height: 100vh;
     overflow: hidden;
+    position: relative;
   }
 
+  /* === Grain texture overlay === */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    opacity: 0.035;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+    background-size: 128px;
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  /* === Ambient glow === */
+  body::after {
+    content: '';
+    position: fixed;
+    top: -30%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 800px;
+    height: 600px;
+    background: radial-gradient(ellipse, rgba(216, 236, 130, 0.06) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* === Slides === */
   .slide {
     position: absolute;
     inset: 0;
@@ -23,343 +77,435 @@
     align-items: center;
     justify-content: center;
     opacity: 0;
-    transition: opacity 0.8s ease;
+    transform: translateY(8px);
+    transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
     pointer-events: none;
+    z-index: 2;
   }
 
   .slide.active {
     opacity: 1;
+    transform: translateY(0);
     pointer-events: auto;
   }
 
   .container {
     text-align: center;
-    width: 90%;
-    max-width: 1200px;
+    width: 92%;
+    max-width: 1280px;
   }
 
-  /* Shared header */
-  .header { margin-bottom: 40px; }
+  /* === Header === */
+  .header { margin-bottom: 48px; }
 
-  .logo { margin-bottom: 24px; }
+  .logo { margin-bottom: 28px; }
   .logo img {
-    height: 32px;
+    height: 28px;
     filter: brightness(0) invert(1);
+    opacity: 0.7;
   }
 
   .header h1 {
-    font-size: 2.4rem;
-    font-weight: 300;
+    font-family: var(--font-display);
+    font-size: 1.4rem;
+    font-weight: 400;
     text-transform: uppercase;
-    letter-spacing: 6px;
-    color: #888;
-    margin-bottom: 8px;
+    letter-spacing: 12px;
+    color: var(--text-secondary);
+    margin-bottom: 6px;
   }
 
   .header h2 {
-    font-size: 1.2rem;
+    font-family: var(--font-body);
+    font-size: 0.85rem;
     font-weight: 400;
-    color: #555;
-    letter-spacing: 3px;
+    color: var(--text-tertiary);
+    letter-spacing: 4px;
     text-transform: uppercase;
   }
 
-  .pulse-dot {
-    display: inline-block;
-    width: 8px; height: 8px;
-    background: #d8ec82;
-    border-radius: 50%;
-    margin-left: 10px;
-    animation: pulse 2s infinite;
+  .live-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-left: 12px;
     vertical-align: middle;
   }
 
-  @keyframes pulse {
-    0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(216, 236, 130, 0.7); }
-    50% { opacity: 0.7; box-shadow: 0 0 0 10px rgba(216, 236, 130, 0); }
+  .live-dot {
+    width: 6px; height: 6px;
+    background: var(--lime);
+    border-radius: 50%;
+    animation: livePulse 2s ease infinite;
   }
 
-  /* ====== SLIDE 1 — Revenue Goal ====== */
-  .current-revenue {
-    font-size: 7rem;
-    font-weight: 700;
-    background: linear-gradient(135deg, #d8ec82, #00b67a);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    line-height: 1.1;
-    transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  .live-text {
+    font-family: var(--font-body);
+    font-size: 0.65rem;
+    font-weight: 600;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--lime);
+    opacity: 0.8;
+  }
+
+  @keyframes livePulse {
+    0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(216, 236, 130, 0.6); }
+    50% { opacity: 0.5; box-shadow: 0 0 0 8px rgba(216, 236, 130, 0); }
+  }
+
+  /* === SLIDE 1 — Revenue === */
+  .revenue-number {
+    font-family: var(--font-display);
+    font-size: 8rem;
+    font-weight: 900;
+    letter-spacing: -4px;
+    line-height: 1;
+    color: var(--text-primary);
+    position: relative;
+  }
+
+  .revenue-number::after {
+    content: '';
+    position: absolute;
+    bottom: -4px;
+    left: 10%;
+    right: 10%;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--lime), transparent);
+    opacity: 0.3;
   }
 
   .goal-label {
-    font-size: 1.6rem;
-    color: #555;
-    margin-top: 8px;
+    font-family: var(--font-body);
+    font-size: 1rem;
+    color: var(--text-tertiary);
+    margin-top: 16px;
     font-weight: 300;
+    letter-spacing: 2px;
   }
 
-  .goal-label span { color: #999; font-weight: 500; }
-  .revenue-display { margin-bottom: 50px; }
+  .goal-label span {
+    color: var(--text-secondary);
+    font-weight: 500;
+  }
 
-  .progress-container {
-    width: 100%; height: 36px;
-    background: #1a1a1a;
-    border-radius: 18px;
+  .revenue-display { margin-bottom: 56px; }
+
+  /* Progress */
+  .progress-track {
+    width: 100%;
+    height: 4px;
+    background: var(--surface);
+    border-radius: 2px;
     overflow: hidden;
-    margin-bottom: 20px;
-    border: 1px solid #2a2a2a;
+    margin-bottom: 16px;
+    position: relative;
   }
 
-  .progress-bar {
+  .progress-fill {
     height: 100%;
-    border-radius: 18px;
-    background: linear-gradient(90deg, #00b67a, #d8ec82);
+    border-radius: 2px;
+    background: var(--lime);
     transition: width 1.5s cubic-bezier(0.16, 1, 0.3, 1);
     position: relative;
-    box-shadow: 0 0 30px rgba(216, 236, 130, 0.2);
+    box-shadow: 0 0 20px rgba(216, 236, 130, 0.4);
   }
 
-  .progress-bar::after {
+  .progress-fill::after {
     content: '';
     position: absolute;
     inset: 0;
-    background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.15) 50%, transparent 100%);
-    animation: shimmer 2.5s infinite;
+    background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.4) 50%, transparent 100%);
+    animation: shimmer 3s ease infinite;
   }
 
   @keyframes shimmer {
     0% { transform: translateX(-100%); }
-    100% { transform: translateX(100%); }
+    100% { transform: translateX(200%); }
   }
 
   .progress-labels {
     display: flex;
     justify-content: space-between;
-    font-size: 1rem;
-    color: #555;
-  }
-
-  .percentage {
-    font-size: 2rem;
-    font-weight: 600;
-    color: #d8ec82;
-    margin-bottom: 30px;
-  }
-
-  .stats {
-    display: flex;
-    justify-content: center;
-    gap: 80px;
-    margin-top: 50px;
-  }
-
-  .stat-value { font-size: 2.2rem; font-weight: 600; color: #ddd; }
-
-  .stat-label {
-    font-size: 0.9rem;
-    color: #555;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-    margin-top: 4px;
-  }
-
-  /* ====== Distribution + Product slides ====== */
-  .big-total {
-    font-size: 3.5rem;
-    font-weight: 700;
-    background: linear-gradient(135deg, #d8ec82, #00b67a);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    margin-bottom: 50px;
-  }
-
-  .categories {
-    display: flex;
-    justify-content: center;
-    gap: 40px;
-  }
-
-  .category {
-    flex: 1;
-    max-width: 340px;
-    background: #141414;
-    border-radius: 20px;
-    padding: 35px 30px;
-    border: 1px solid #2a2a2a;
-    position: relative;
-    overflow: hidden;
-  }
-
-  .category::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 3px;
-  }
-
-  /* Category colors */
-  .cat-batterij::before { background: linear-gradient(90deg, #d8ec82, #b8d462); }
-  .cat-zonne::before { background: linear-gradient(90deg, #f5a623, #ffd700); }
-  .cat-warmte::before { background: linear-gradient(90deg, #00b67a, #00d68f); }
-
-  /* Brand colors */
-  .brand-alphaess::before { background: linear-gradient(90deg, #3b82f6, #60a5fa); }
-  .brand-ecoflow::before { background: linear-gradient(90deg, #10b981, #34d399); }
-  .brand-jasolar::before { background: linear-gradient(90deg, #f5a623, #ffd700); }
-  .brand-remeha::before { background: linear-gradient(90deg, #ff6b6b, #ee5a24); }
-  .brand-intergas::before { background: linear-gradient(90deg, #00b67a, #00d68f); }
-  .brand-hisense::before { background: linear-gradient(90deg, #a78bfa, #7b61ff); }
-  .brand-solarwatt::before { background: linear-gradient(90deg, #e06030, #ff7844); }
-  .brand-sigenergy::before { background: linear-gradient(90deg, #a78bfa, #8b5cf6); }
-  .brand-enphase::before { background: linear-gradient(90deg, #eab308, #facc15); }
-
-  .category-name {
-    font-size: 1.1rem;
-    font-weight: 500;
-    text-transform: uppercase;
-    letter-spacing: 3px;
-    color: #888;
-    margin-bottom: 20px;
-  }
-
-  .category-pct {
-    font-size: 3.2rem;
-    font-weight: 700;
-    line-height: 1;
-    margin-bottom: 8px;
-  }
-
-  .cat-batterij .category-pct { color: #d8ec82; }
-  .cat-zonne .category-pct { color: #f5a623; }
-  .cat-warmte .category-pct { color: #00b67a; }
-
-  .brand-alphaess .category-pct { color: #3b82f6; }
-  .brand-ecoflow .category-pct { color: #10b981; }
-  .brand-jasolar .category-pct { color: #f5a623; }
-  .brand-remeha .category-pct { color: #ff6b6b; }
-  .brand-intergas .category-pct { color: #00b67a; }
-  .brand-hisense .category-pct { color: #a78bfa; }
-  .brand-solarwatt .category-pct { color: #e06030; }
-  .brand-sigenergy .category-pct { color: #a78bfa; }
-  .brand-enphase .category-pct { color: #eab308; }
-
-  .category-amount {
-    font-size: 1.8rem;
-    font-weight: 600;
-    color: #ddd;
-    margin-bottom: 16px;
-    transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
-  }
-
-  .cat-bar-container {
-    width: 100%; height: 8px;
-    background: #222;
-    border-radius: 4px;
-    overflow: hidden;
-  }
-
-  .cat-bar {
-    height: 100%;
-    border-radius: 4px;
-    transition: width 1.5s cubic-bezier(0.16, 1, 0.3, 1);
-  }
-
-  .cat-batterij .cat-bar { background: linear-gradient(90deg, #d8ec82, #b8d462); box-shadow: 0 0 15px rgba(216, 236, 130, 0.3); }
-  .cat-zonne .cat-bar { background: linear-gradient(90deg, #f5a623, #ffd700); box-shadow: 0 0 15px rgba(245, 166, 35, 0.3); }
-  .cat-warmte .cat-bar { background: linear-gradient(90deg, #00b67a, #00d68f); box-shadow: 0 0 15px rgba(0, 182, 122, 0.3); }
-
-  .brand-alphaess .cat-bar { background: linear-gradient(90deg, #3b82f6, #60a5fa); box-shadow: 0 0 15px rgba(59, 130, 246, 0.3); }
-  .brand-ecoflow .cat-bar { background: linear-gradient(90deg, #10b981, #34d399); box-shadow: 0 0 15px rgba(16, 185, 129, 0.3); }
-  .brand-jasolar .cat-bar { background: linear-gradient(90deg, #f5a623, #ffd700); box-shadow: 0 0 15px rgba(245, 166, 35, 0.3); }
-  .brand-remeha .cat-bar { background: linear-gradient(90deg, #ff6b6b, #ee5a24); box-shadow: 0 0 15px rgba(255, 107, 107, 0.3); }
-  .brand-intergas .cat-bar { background: linear-gradient(90deg, #00b67a, #00d68f); box-shadow: 0 0 15px rgba(0, 182, 122, 0.3); }
-  .brand-hisense .cat-bar { background: linear-gradient(90deg, #a78bfa, #7b61ff); box-shadow: 0 0 15px rgba(167, 139, 250, 0.3); }
-  .brand-solarwatt .cat-bar { background: linear-gradient(90deg, #e06030, #ff7844); box-shadow: 0 0 15px rgba(224, 96, 48, 0.3); }
-  .brand-sigenergy .cat-bar { background: linear-gradient(90deg, #a78bfa, #8b5cf6); box-shadow: 0 0 15px rgba(167, 139, 250, 0.3); }
-  .brand-enphase .cat-bar { background: linear-gradient(90deg, #eab308, #facc15); box-shadow: 0 0 15px rgba(234, 179, 8, 0.3); }
-
-  .category-goal {
-    font-size: 0.85rem;
-    color: #555;
-    margin-top: 10px;
+    font-family: var(--font-body);
+    font-size: 0.7rem;
+    color: var(--text-tertiary);
     letter-spacing: 1px;
   }
 
-  .category-goal span { color: #777; font-weight: 500; }
-
-  /* Animations */
-  .update-flash { animation: flash 0.6s ease; }
-
-  @keyframes flash {
-    0% { filter: brightness(1); }
-    30% { filter: brightness(1.4); }
-    100% { filter: brightness(1); }
+  .pct-display {
+    font-family: var(--font-display);
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: var(--lime);
+    margin-bottom: 32px;
+    letter-spacing: -0.5px;
   }
 
-  .increment-popup {
-    position: fixed;
+  .stats-row {
+    display: flex;
+    justify-content: center;
+    gap: 100px;
+    margin-top: 56px;
+  }
+
+  .stat-value {
+    font-family: var(--font-display);
     font-size: 2rem;
     font-weight: 700;
-    color: #d8ec82;
-    pointer-events: none;
-    opacity: 0;
-    transition: all 1.2s ease;
+    color: var(--text-primary);
+    letter-spacing: -1px;
   }
 
-  /* Slide indicators */
+  .stat-label {
+    font-family: var(--font-body);
+    font-size: 0.65rem;
+    color: var(--text-tertiary);
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    margin-top: 6px;
+    font-weight: 500;
+  }
+
+  /* === Cards (Distribution + Brand slides) === */
+  .big-total {
+    font-family: var(--font-display);
+    font-size: 3.6rem;
+    font-weight: 800;
+    color: var(--text-primary);
+    margin-bottom: 48px;
+    letter-spacing: -2px;
+  }
+
+  .cards {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+  }
+
+  .card {
+    flex: 1;
+    max-width: 280px;
+    background: var(--surface);
+    border-radius: 16px;
+    padding: 28px 24px;
+    border: 1px solid var(--surface-border);
+    position: relative;
+    overflow: hidden;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    transition: background 0.3s ease;
+  }
+
+  .card:hover {
+    background: var(--surface-hover);
+  }
+
+  /* Top accent stripe */
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+  }
+
+  /* Category accent colors */
+  .cat-batterij::before { background: var(--lime); }
+  .cat-zonne::before { background: var(--gold); }
+  .cat-warmte::before { background: var(--green); }
+
+  /* Brand accent colors */
+  .brand-alphaess::before { background: var(--blue); }
+  .brand-ecoflow::before { background: var(--emerald); }
+  .brand-solarwatt::before { background: var(--orange); }
+  .brand-sigenergy::before { background: var(--violet); }
+  .brand-enphase::before { background: var(--amber); }
+  .brand-jasolar::before { background: var(--gold); }
+  .brand-remeha::before { background: var(--red); }
+  .brand-intergas::before { background: var(--teal); }
+  .brand-hisense::before { background: var(--purple); }
+
+  .card-name {
+    font-family: var(--font-body);
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    color: var(--text-secondary);
+    margin-bottom: 20px;
+  }
+
+  .card-pct {
+    font-family: var(--font-display);
+    font-size: 2.6rem;
+    font-weight: 800;
+    line-height: 1;
+    margin-bottom: 4px;
+    letter-spacing: -1px;
+  }
+
+  .cat-batterij .card-pct { color: var(--lime); }
+  .cat-zonne .card-pct { color: var(--gold); }
+  .cat-warmte .card-pct { color: var(--green); }
+  .brand-alphaess .card-pct { color: var(--blue); }
+  .brand-ecoflow .card-pct { color: var(--emerald); }
+  .brand-solarwatt .card-pct { color: var(--orange); }
+  .brand-sigenergy .card-pct { color: var(--violet); }
+  .brand-enphase .card-pct { color: var(--amber); }
+  .brand-jasolar .card-pct { color: var(--gold); }
+  .brand-remeha .card-pct { color: var(--red); }
+  .brand-intergas .card-pct { color: var(--teal); }
+  .brand-hisense .card-pct { color: var(--purple); }
+
+  .card-amount {
+    font-family: var(--font-display);
+    font-size: 1.4rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 18px;
+    letter-spacing: -0.5px;
+  }
+
+  .bar-track {
+    width: 100%; height: 3px;
+    background: rgba(255, 255, 255, 0.06);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .bar-fill {
+    height: 100%;
+    border-radius: 2px;
+    transition: width 1.5s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .cat-batterij .bar-fill { background: var(--lime); box-shadow: 0 0 12px rgba(216, 236, 130, 0.3); }
+  .cat-zonne .bar-fill { background: var(--gold); box-shadow: 0 0 12px rgba(245, 166, 35, 0.3); }
+  .cat-warmte .bar-fill { background: var(--green); box-shadow: 0 0 12px rgba(0, 182, 122, 0.3); }
+  .brand-alphaess .bar-fill { background: var(--blue); box-shadow: 0 0 12px rgba(59, 130, 246, 0.3); }
+  .brand-ecoflow .bar-fill { background: var(--emerald); box-shadow: 0 0 12px rgba(16, 185, 129, 0.3); }
+  .brand-solarwatt .bar-fill { background: var(--orange); box-shadow: 0 0 12px rgba(224, 96, 48, 0.3); }
+  .brand-sigenergy .bar-fill { background: var(--violet); box-shadow: 0 0 12px rgba(167, 139, 250, 0.3); }
+  .brand-enphase .bar-fill { background: var(--amber); box-shadow: 0 0 12px rgba(234, 179, 8, 0.3); }
+  .brand-jasolar .bar-fill { background: var(--gold); box-shadow: 0 0 12px rgba(245, 166, 35, 0.3); }
+  .brand-remeha .bar-fill { background: var(--red); box-shadow: 0 0 12px rgba(255, 107, 107, 0.3); }
+  .brand-intergas .bar-fill { background: var(--teal); box-shadow: 0 0 12px rgba(0, 182, 122, 0.3); }
+  .brand-hisense .bar-fill { background: var(--purple); box-shadow: 0 0 12px rgba(167, 139, 250, 0.3); }
+
+  .card-target {
+    font-family: var(--font-body);
+    font-size: 0.65rem;
+    color: var(--text-tertiary);
+    margin-top: 12px;
+    letter-spacing: 1px;
+  }
+
+  .card-target span {
+    color: var(--text-secondary);
+    font-weight: 600;
+  }
+
+  /* === Sale popup === */
+  .sale-popup {
+    position: fixed;
+    pointer-events: none;
+    z-index: 50;
+    opacity: 0;
+    transition: all 1.4s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .sale-popup-amount {
+    font-family: var(--font-display);
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: var(--lime);
+    letter-spacing: -1px;
+  }
+
+  .sale-popup-name {
+    font-family: var(--font-body);
+    font-size: 0.7rem;
+    color: var(--text-secondary);
+    letter-spacing: 1px;
+    margin-top: 2px;
+  }
+
+  /* === Indicators === */
   .indicators {
     position: fixed;
-    bottom: 30px;
+    bottom: 32px;
     left: 50%;
     transform: translateX(-50%);
     display: flex;
-    gap: 10px;
+    gap: 8px;
     z-index: 100;
   }
 
-  .dot {
-    width: 10px; height: 10px;
-    border-radius: 50%;
-    background: #333;
-    transition: all 0.4s ease;
+  .ind {
+    width: 24px; height: 3px;
+    border-radius: 2px;
+    background: rgba(255, 255, 255, 0.1);
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
     cursor: pointer;
   }
 
-  .dot.active {
-    background: #d8ec82;
-    box-shadow: 0 0 10px rgba(216, 236, 130, 0.5);
-    transform: scale(1.2);
+  .ind:hover {
+    background: rgba(255, 255, 255, 0.2);
   }
+
+  .ind.active {
+    background: var(--lime);
+    width: 40px;
+    box-shadow: 0 0 12px rgba(216, 236, 130, 0.4);
+  }
+
+  /* === Decorative corner marks === */
+  .corner-mark {
+    position: fixed;
+    width: 40px; height: 40px;
+    z-index: 3;
+    opacity: 0.08;
+  }
+  .corner-mark.tl { top: 24px; left: 24px; border-top: 1px solid #fff; border-left: 1px solid #fff; }
+  .corner-mark.tr { top: 24px; right: 24px; border-top: 1px solid #fff; border-right: 1px solid #fff; }
+  .corner-mark.bl { bottom: 24px; left: 24px; border-bottom: 1px solid #fff; border-left: 1px solid #fff; }
+  .corner-mark.br { bottom: 24px; right: 24px; border-bottom: 1px solid #fff; border-right: 1px solid #fff; }
 </style>
 </head>
 <body>
+
+<!-- Decorative corners -->
+<div class="corner-mark tl"></div>
+<div class="corner-mark tr"></div>
+<div class="corner-mark bl"></div>
+<div class="corner-mark br"></div>
 
 <!-- SLIDE 1 — Revenue Goal -->
 <div class="slide active" id="slide-revenue">
   <div class="container">
     <div class="header">
       <div class="logo"><img src="https://voltera.nl/voltera-logo.png" alt="Voltera"></div>
-      <h1>Monthly Revenue <span class="pulse-dot"></span></h1>
+      <h1>Monthly Revenue <span class="live-badge"><span class="live-dot"></span><span class="live-text">Live</span></span></h1>
       <h2>March 2026</h2>
     </div>
     <div class="revenue-display">
-      <div class="current-revenue" id="revenue">-</div>
-      <div class="goal-label">Target: <span>€26,000,000</span></div>
+      <div class="revenue-number" id="revenue">-</div>
+      <div class="goal-label">Target <span>€26,000,000</span></div>
     </div>
-    <div class="percentage" id="percentage">-</div>
-    <div class="progress-container">
-      <div class="progress-bar" id="progressBar" style="width: 0%"></div>
+    <div class="pct-display" id="percentage">-</div>
+    <div class="progress-track">
+      <div class="progress-fill" id="progressBar" style="width: 0%"></div>
     </div>
     <div class="progress-labels">
       <span>€0</span><span>€6.5M</span><span>€13M</span><span>€19.5M</span><span>€26M</span>
     </div>
-    <div class="stats">
-      <div class="stat">
+    <div class="stats-row">
+      <div>
         <div class="stat-value" id="remaining">-</div>
         <div class="stat-label">Remaining</div>
       </div>
-      <div class="stat">
+      <div>
         <div class="stat-value" id="today">-</div>
         <div class="stat-label">Today's Revenue</div>
       </div>
@@ -372,31 +518,31 @@
   <div class="container">
     <div class="header">
       <div class="logo"><img src="https://voltera.nl/voltera-logo.png" alt="Voltera"></div>
-      <h1>Revenue Distribution <span class="pulse-dot"></span></h1>
+      <h1>Revenue Distribution <span class="live-badge"><span class="live-dot"></span><span class="live-text">Live</span></span></h1>
       <h2>March 2026</h2>
     </div>
     <div class="big-total" id="distTotal">-</div>
-    <div class="categories">
-      <div class="category cat-batterij">
-        <div class="category-name">Home Batteries</div>
-        <div class="category-pct" id="pctBatterij">-</div>
-        <div class="category-amount" id="amtBatterij">-</div>
-        <div class="cat-bar-container"><div class="cat-bar" id="barBatterij" style="width:0%"></div></div>
-        <div class="category-goal">Target: <span id="goalBatterij">-</span></div>
+    <div class="cards">
+      <div class="card cat-batterij">
+        <div class="card-name">Home Batteries</div>
+        <div class="card-pct" id="pctBatterij">-</div>
+        <div class="card-amount" id="amtBatterij">-</div>
+        <div class="bar-track"><div class="bar-fill" id="barBatterij" style="width:0%"></div></div>
+        <div class="card-target">Target <span id="goalBatterij">-</span></div>
       </div>
-      <div class="category cat-zonne">
-        <div class="category-name">Solar Panels</div>
-        <div class="category-pct" id="pctZonne">-</div>
-        <div class="category-amount" id="amtZonne">-</div>
-        <div class="cat-bar-container"><div class="cat-bar" id="barZonne" style="width:0%"></div></div>
-        <div class="category-goal">Target: <span id="goalZonne">-</span></div>
+      <div class="card cat-zonne">
+        <div class="card-name">Solar Panels</div>
+        <div class="card-pct" id="pctZonne">-</div>
+        <div class="card-amount" id="amtZonne">-</div>
+        <div class="bar-track"><div class="bar-fill" id="barZonne" style="width:0%"></div></div>
+        <div class="card-target">Target <span id="goalZonne">-</span></div>
       </div>
-      <div class="category cat-warmte">
-        <div class="category-name">Hybrid Heat Pumps</div>
-        <div class="category-pct" id="pctWarmte">-</div>
-        <div class="category-amount" id="amtWarmte">-</div>
-        <div class="cat-bar-container"><div class="cat-bar" id="barWarmte" style="width:0%"></div></div>
-        <div class="category-goal">Target: <span id="goalWarmte">-</span></div>
+      <div class="card cat-warmte">
+        <div class="card-name">Hybrid Heat Pumps</div>
+        <div class="card-pct" id="pctWarmte">-</div>
+        <div class="card-amount" id="amtWarmte">-</div>
+        <div class="bar-track"><div class="bar-fill" id="barWarmte" style="width:0%"></div></div>
+        <div class="card-target">Target <span id="goalWarmte">-</span></div>
       </div>
     </div>
   </div>
@@ -407,40 +553,40 @@
   <div class="container">
     <div class="header">
       <div class="logo"><img src="https://voltera.nl/voltera-logo.png" alt="Voltera"></div>
-      <h1>Home Batteries <span class="pulse-dot"></span></h1>
+      <h1>Home Batteries <span class="live-badge"><span class="live-dot"></span><span class="live-text">Live</span></span></h1>
       <h2>Revenue per Brand</h2>
     </div>
     <div class="big-total" id="batTotal">-</div>
-    <div class="categories">
-      <div class="category brand-alphaess">
-        <div class="category-name">AlphaESS</div>
-        <div class="category-pct" id="pctAlphaess">-</div>
-        <div class="category-amount" id="amtAlphaess">-</div>
-        <div class="cat-bar-container"><div class="cat-bar" id="barAlphaess" style="width:0%"></div></div>
+    <div class="cards">
+      <div class="card brand-alphaess">
+        <div class="card-name">AlphaESS</div>
+        <div class="card-pct" id="pctAlphaess">-</div>
+        <div class="card-amount" id="amtAlphaess">-</div>
+        <div class="bar-track"><div class="bar-fill" id="barAlphaess" style="width:0%"></div></div>
       </div>
-      <div class="category brand-ecoflow">
-        <div class="category-name">EcoFlow</div>
-        <div class="category-pct" id="pctEcoflow">-</div>
-        <div class="category-amount" id="amtEcoflow">-</div>
-        <div class="cat-bar-container"><div class="cat-bar" id="barEcoflow" style="width:0%"></div></div>
+      <div class="card brand-ecoflow">
+        <div class="card-name">EcoFlow</div>
+        <div class="card-pct" id="pctEcoflow">-</div>
+        <div class="card-amount" id="amtEcoflow">-</div>
+        <div class="bar-track"><div class="bar-fill" id="barEcoflow" style="width:0%"></div></div>
       </div>
-      <div class="category brand-solarwatt">
-        <div class="category-name">Solarwatt</div>
-        <div class="category-pct" id="pctSolarwatt">-</div>
-        <div class="category-amount" id="amtSolarwatt">-</div>
-        <div class="cat-bar-container"><div class="cat-bar" id="barSolarwatt" style="width:0%"></div></div>
+      <div class="card brand-solarwatt">
+        <div class="card-name">Solarwatt</div>
+        <div class="card-pct" id="pctSolarwatt">-</div>
+        <div class="card-amount" id="amtSolarwatt">-</div>
+        <div class="bar-track"><div class="bar-fill" id="barSolarwatt" style="width:0%"></div></div>
       </div>
-      <div class="category brand-sigenergy">
-        <div class="category-name">Sigenergy</div>
-        <div class="category-pct" id="pctSigenergy">-</div>
-        <div class="category-amount" id="amtSigenergy">-</div>
-        <div class="cat-bar-container"><div class="cat-bar" id="barSigenergy" style="width:0%"></div></div>
+      <div class="card brand-sigenergy">
+        <div class="card-name">Sigenergy</div>
+        <div class="card-pct" id="pctSigenergy">-</div>
+        <div class="card-amount" id="amtSigenergy">-</div>
+        <div class="bar-track"><div class="bar-fill" id="barSigenergy" style="width:0%"></div></div>
       </div>
-      <div class="category brand-enphase">
-        <div class="category-name">Enphase</div>
-        <div class="category-pct" id="pctEnphase">-</div>
-        <div class="category-amount" id="amtEnphase">-</div>
-        <div class="cat-bar-container"><div class="cat-bar" id="barEnphase" style="width:0%"></div></div>
+      <div class="card brand-enphase">
+        <div class="card-name">Enphase</div>
+        <div class="card-pct" id="pctEnphase">-</div>
+        <div class="card-amount" id="amtEnphase">-</div>
+        <div class="bar-track"><div class="bar-fill" id="barEnphase" style="width:0%"></div></div>
       </div>
     </div>
   </div>
@@ -451,48 +597,48 @@
   <div class="container">
     <div class="header">
       <div class="logo"><img src="https://voltera.nl/voltera-logo.png" alt="Voltera"></div>
-      <h1>Solar Panels <span class="pulse-dot"></span></h1>
+      <h1>Solar Panels <span class="live-badge"><span class="live-dot"></span><span class="live-text">Live</span></span></h1>
       <h2>Revenue per Brand</h2>
     </div>
     <div class="big-total" id="zonTotal">-</div>
-    <div class="categories">
-      <div class="category brand-jasolar">
-        <div class="category-name">JA Solar</div>
-        <div class="category-pct" id="pctJasolar">-</div>
-        <div class="category-amount" id="amtJasolar">-</div>
-        <div class="cat-bar-container"><div class="cat-bar" id="barJasolar" style="width:0%"></div></div>
+    <div class="cards">
+      <div class="card brand-jasolar">
+        <div class="card-name">JA Solar</div>
+        <div class="card-pct" id="pctJasolar">-</div>
+        <div class="card-amount" id="amtJasolar">-</div>
+        <div class="bar-track"><div class="bar-fill" id="barJasolar" style="width:0%"></div></div>
       </div>
     </div>
   </div>
 </div>
 
-<!-- SLIDE 5 — Warmtepompen by brand -->
+<!-- SLIDE 5 — Hybrid Heat Pumps by brand -->
 <div class="slide" id="slide-warmte">
   <div class="container">
     <div class="header">
       <div class="logo"><img src="https://voltera.nl/voltera-logo.png" alt="Voltera"></div>
-      <h1>Hybrid Heat Pumps <span class="pulse-dot"></span></h1>
+      <h1>Hybrid Heat Pumps <span class="live-badge"><span class="live-dot"></span><span class="live-text">Live</span></span></h1>
       <h2>Revenue per Brand</h2>
     </div>
     <div class="big-total" id="wpTotal">-</div>
-    <div class="categories">
-      <div class="category brand-remeha">
-        <div class="category-name">Remeha</div>
-        <div class="category-pct" id="pctRemeha">-</div>
-        <div class="category-amount" id="amtRemeha">-</div>
-        <div class="cat-bar-container"><div class="cat-bar" id="barRemeha" style="width:0%"></div></div>
+    <div class="cards">
+      <div class="card brand-remeha">
+        <div class="card-name">Remeha</div>
+        <div class="card-pct" id="pctRemeha">-</div>
+        <div class="card-amount" id="amtRemeha">-</div>
+        <div class="bar-track"><div class="bar-fill" id="barRemeha" style="width:0%"></div></div>
       </div>
-      <div class="category brand-intergas">
-        <div class="category-name">Intergas</div>
-        <div class="category-pct" id="pctIntergas">-</div>
-        <div class="category-amount" id="amtIntergas">-</div>
-        <div class="cat-bar-container"><div class="cat-bar" id="barIntergas" style="width:0%"></div></div>
+      <div class="card brand-intergas">
+        <div class="card-name">Intergas</div>
+        <div class="card-pct" id="pctIntergas">-</div>
+        <div class="card-amount" id="amtIntergas">-</div>
+        <div class="bar-track"><div class="bar-fill" id="barIntergas" style="width:0%"></div></div>
       </div>
-      <div class="category brand-hisense">
-        <div class="category-name">Hisense</div>
-        <div class="category-pct" id="pctHisense">-</div>
-        <div class="category-amount" id="amtHisense">-</div>
-        <div class="cat-bar-container"><div class="cat-bar" id="barHisense" style="width:0%"></div></div>
+      <div class="card brand-hisense">
+        <div class="card-name">Hisense</div>
+        <div class="card-pct" id="pctHisense">-</div>
+        <div class="card-amount" id="amtHisense">-</div>
+        <div class="bar-track"><div class="bar-fill" id="barHisense" style="width:0%"></div></div>
       </div>
     </div>
   </div>
@@ -505,12 +651,9 @@
   // === Config ===
   const GOAL = 26_000_000;
   const START = 11_847_362;
-  // ~12 sales/hour at avg ~€8.3k = ~€100k/hour → 1 sale every 5 min
   const INTERVAL_MS = 5 * 60 * 1000;
 
-  // Product catalog from CSV (exact selling prices)
   const PRODUCTS = [
-    // AlphaESS — batteries (60% of all sales)
     { brand: 'alphaess', cat: 'batterij', name: 'AlphaESS 11.4 kWh 5kW 1-fase', price: 7500 },
     { brand: 'alphaess', cat: 'batterij', name: 'AlphaESS 11.4 kWh 10kW 3-fase', price: 8500 },
     { brand: 'alphaess', cat: 'batterij', name: 'AlphaESS 15.2 kWh 10kW 3-fase', price: 9250 },
@@ -528,34 +671,25 @@
     { brand: 'alphaess', cat: 'batterij', name: 'Alpha ESS 46.5 kWh 3-fase', price: 14800 },
     { brand: 'alphaess', cat: 'batterij', name: 'Alpha ESS Laadpaal', price: 1000 },
     { brand: 'alphaess', cat: 'batterij', name: 'Alpha ESS Back-up Box', price: 2000 },
-    // EcoFlow — batteries
     { brand: 'ecoflow', cat: 'batterij', name: 'EcoFlow Stream Pro 1.92kWh', price: 1600 },
     { brand: 'ecoflow', cat: 'batterij', name: 'EcoFlow Stream UltraX 3.84kWh', price: 1900 },
-    // Solarwatt — batteries
     { brand: 'solarwatt', cat: 'batterij', name: 'Solarwatt Battery Vision 7.2 kWh', price: 8500 },
     { brand: 'solarwatt', cat: 'batterij', name: 'Solarwatt Battery Vision 14.4 kWh', price: 14200 },
-    // Sigenergy — batteries
     { brand: 'sigenergy', cat: 'batterij', name: 'Sigenergy SigenStor 5 kWh', price: 6800 },
     { brand: 'sigenergy', cat: 'batterij', name: 'Sigenergy SigenStor 10 kWh', price: 11500 },
-    // Enphase — batteries
     { brand: 'enphase', cat: 'batterij', name: 'Enphase IQ Battery 5P', price: 7200 },
     { brand: 'enphase', cat: 'batterij', name: 'Enphase IQ Battery 10T', price: 12800 },
-    // JA Solar — solar panels
     { brand: 'jasolar', cat: 'zonne', name: 'JA Solar 455W JAM54D41-455/LB', price: 745 },
     { brand: 'jasolar', cat: 'zonne', name: 'JA Solar 450W JAM54D41-450/LB', price: 745 },
     { brand: 'jasolar', cat: 'zonne', name: 'JA Solar 455W DC-gekoppeld', price: 645 },
-    // Remeha — heat pumps
     { brand: 'remeha', cat: 'warmte', name: 'Remeha Elga Ace 4 kW', price: 7700 },
     { brand: 'remeha', cat: 'warmte', name: 'Remeha Elga Ace 6 kW', price: 8200 },
     { brand: 'remeha', cat: 'warmte', name: 'Remeha Avanta 35C ketel', price: 3300 },
-    // Intergas — heat pumps
     { brand: 'intergas', cat: 'warmte', name: 'Intergas Xtend 5 kW', price: 7850 },
     { brand: 'intergas', cat: 'warmte', name: 'Intergas HReco combi-ketel', price: 3300 },
-    // Hisense — heat pumps
     { brand: 'hisense', cat: 'warmte', name: 'Hisense Hi-Hybrid R290', price: 7950 },
   ];
 
-  // Split products by brand for selection
   const ALPHAESS_PRODUCTS = PRODUCTS.filter(p => p.brand === 'alphaess');
   const OTHER_PRODUCTS = PRODUCTS.filter(p => p.brand !== 'alphaess');
 
@@ -565,8 +699,6 @@
     warmte: GOAL * 0.20,
   };
 
-  // === Deterministic PRNG ===
-  // Sales start ticking from March 13, 2026 at 09:30 local time
   const REF = new Date(2026, 2, 13, 9, 30, 0).getTime();
 
   function mulberry32(seed) {
@@ -579,7 +711,6 @@
   }
 
   function pickProduct(rng) {
-    // 60% AlphaESS, 40% other brands
     if (rng() < 0.60) {
       return ALPHAESS_PRODUCTS[Math.floor(rng() * ALPHAESS_PRODUCTS.length)];
     } else {
@@ -589,24 +720,20 @@
 
   function getState() {
     const elapsed = Date.now() - REF;
-    const intervals = Math.floor(elapsed / INTERVAL_MS);
+    const intervals = Math.max(0, Math.floor(elapsed / INTERVAL_MS));
 
-    // Accumulators
     const cats = { batterij: 0, zonne: 0, warmte: 0 };
     const brands = {
       alphaess: 0, ecoflow: 0, solarwatt: 0, sigenergy: 0, enphase: 0,
-      jasolar: 0,
-      remeha: 0, intergas: 0, hisense: 0,
+      jasolar: 0, remeha: 0, intergas: 0, hisense: 0,
     };
 
-    // Starting distribution — ~65% batteries, ~5% solar, ~30% heat pumps
     const startRng = mulberry32(999);
     const BAT_PRODUCTS = PRODUCTS.filter(p => p.cat === 'batterij');
     const SOLAR_PRODUCTS = PRODUCTS.filter(p => p.cat === 'zonne');
     const WP_PRODUCTS = PRODUCTS.filter(p => p.cat === 'warmte');
     const batTarget = START * (0.63 + startRng() * 0.04);
     const solTarget = START * (0.045 + startRng() * 0.015);
-    // warmte gets the rest
     let accumulated = 0;
     while (cats.batterij < batTarget) {
       const p = BAT_PRODUCTS[Math.floor(startRng() * BAT_PRODUCTS.length)];
@@ -630,10 +757,9 @@
     for (let i = 0; i < intervals; i++) {
       const rng = mulberry32(i + 42);
       const product = pickProduct(rng);
-      const price = product.price;
-      todayRev += price;
-      cats[product.cat] += price;
-      brands[product.brand] += price;
+      todayRev += product.price;
+      cats[product.cat] += product.price;
+      brands[product.brand] += product.price;
       lastProduct = product;
     }
 
@@ -681,7 +807,6 @@
     activeAnimations.set(el, requestAnimationFrame(tick));
   }
 
-  // === Previous state for animation ===
   let prev = null;
   let prevIntervals = -1;
   let animating = false;
@@ -701,12 +826,10 @@
       animating = true;
       setTimeout(() => { animating = false; }, 2700);
 
-      // Slide 1
       animateCount(document.getElementById('revenue'), prev.revenue, revenue);
       animateCount(document.getElementById('remaining'), Math.max(GOAL - prev.revenue, 0), Math.max(GOAL - revenue, 0));
       animateCount(document.getElementById('today'), prev.todayRev, todayRev);
 
-      // Slide 2
       animateCount(document.getElementById('distTotal'), prev.revenue, revenue);
       for (const c of ['batterij', 'zonne', 'warmte']) {
         const cap = c.charAt(0).toUpperCase() + c.slice(1);
@@ -714,7 +837,6 @@
         animatePct(document.getElementById('pct' + cap), prev.cats[c], prev.revenue, cats[c], revenue);
       }
 
-      // Slide 3 - Batterij brands
       animateCount(document.getElementById('batTotal'), prev.cats.batterij, cats.batterij);
       for (const b of ['alphaess', 'ecoflow', 'solarwatt', 'sigenergy', 'enphase']) {
         const cap = b.charAt(0).toUpperCase() + b.slice(1);
@@ -722,12 +844,10 @@
         animatePct(document.getElementById('pct' + cap), prev.brands[b], prev.cats.batterij, brands[b], cats.batterij);
       }
 
-      // Slide 4 - Zonne brands
       animateCount(document.getElementById('zonTotal'), prev.cats.zonne, cats.zonne);
       animateCount(document.getElementById('amtJasolar'), prev.brands.jasolar, brands.jasolar);
       animatePct(document.getElementById('pctJasolar'), prev.brands.jasolar, prev.cats.zonne, brands.jasolar, cats.zonne);
 
-      // Slide 5 - Warmte brands
       animateCount(document.getElementById('wpTotal'), prev.cats.warmte, cats.warmte);
       for (const b of ['remeha', 'intergas', 'hisense']) {
         const cap = b.charAt(0).toUpperCase() + b.slice(1);
@@ -735,12 +855,10 @@
         animatePct(document.getElementById('pct' + cap), prev.brands[b], prev.cats.warmte, brands[b], cats.warmte);
       }
 
-      // Popup — show the product that was just sold
       if (state.lastProduct) {
         showPopup(state.lastProduct.price, state.lastProduct.name);
       }
     } else {
-      // Static set
       setVal('revenue', formatEuro(revenue));
       setVal('remaining', formatEuro(Math.max(GOAL - revenue, 0)));
       setVal('today', formatEuro(todayRev));
@@ -771,7 +889,6 @@
       }
     }
 
-    // Always update bars + percentage
     setVal('percentage', pctStr(revenue, GOAL));
     setBar('progressBar', pct);
 
@@ -781,7 +898,6 @@
       setVal('goal' + cap, formatEuro(CAT_GOALS[c]));
     }
 
-    // Brand bars (share within category)
     const batBrands = ['alphaess', 'ecoflow', 'solarwatt', 'sigenergy', 'enphase'];
     const maxBat = Math.max(...batBrands.map(b => brands[b]));
     for (const b of batBrands) {
@@ -801,17 +917,17 @@
 
   function showPopup(amount, name) {
     const popup = document.createElement('div');
-    popup.className = 'increment-popup';
-    popup.textContent = '+' + formatEuro(amount);
-    popup.style.left = (30 + Math.random() * 40) + '%';
-    popup.style.top = '35%';
+    popup.className = 'sale-popup';
+    popup.innerHTML = `<div class="sale-popup-amount">+${formatEuro(amount)}</div><div class="sale-popup-name">${name}</div>`;
+    popup.style.left = (25 + Math.random() * 50) + '%';
+    popup.style.top = '40%';
     popup.style.opacity = '1';
     document.body.appendChild(popup);
     requestAnimationFrame(() => {
-      popup.style.top = '15%';
+      popup.style.top = '20%';
       popup.style.opacity = '0';
     });
-    setTimeout(() => popup.remove(), 1500);
+    setTimeout(() => popup.remove(), 1800);
   }
 
   // === Slide switcher ===
@@ -819,11 +935,10 @@
   const slideEls = slideIds.map(id => document.getElementById(id));
   let currentSlide = 0;
 
-  // Build indicators
   const indContainer = document.getElementById('indicators');
   slideIds.forEach((_, i) => {
     const d = document.createElement('div');
-    d.className = 'dot' + (i === 0 ? ' active' : '');
+    d.className = 'ind' + (i === 0 ? ' active' : '');
     d.id = 'dot' + i;
     d.addEventListener('click', () => goToSlide(i));
     indContainer.appendChild(d);
