@@ -566,11 +566,8 @@
   };
 
   // === Deterministic PRNG ===
-  let REF = parseInt(localStorage.getItem('voltera_dash_ref'));
-  if (!REF || isNaN(REF)) {
-    REF = Date.now();
-    localStorage.setItem('voltera_dash_ref', REF);
-  }
+  // Sales start ticking from March 13, 2026 at 09:30 local time
+  const REF = new Date(2026, 2, 13, 9, 30, 0).getTime();
 
   function mulberry32(seed) {
     return function() {
