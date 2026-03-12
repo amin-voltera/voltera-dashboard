@@ -836,13 +836,14 @@ tailwind.config = {
     const startRng = mulberry32(999);
     const SOLAR_PRODUCTS = PRODUCTS.filter(p => p.cat === 'zonne');
     const WP_PRODUCTS = PRODUCTS.filter(p => p.cat === 'warmte');
-    const batTarget = START * (0.58 + startRng() * 0.04);
-    const solTarget = START * (0.04 + startRng() * 0.02);
+    // Starting distribution matches CAT_GOALS ratios (65/15/20)
+    const batTarget = START * 0.65;
+    const solTarget = START * 0.15;
+    const wpTarget = START * 0.20;
     let accumulated = 0;
-    // Fill each battery brand to its revenue target
     const batBrandTargets = {
-      ecoflow: batTarget * 0.35,
-      alphaess: batTarget * 0.20,
+      alphaess: batTarget * 0.27,
+      ecoflow: batTarget * 0.28,
       solarwatt: batTarget * 0.22,
       sigenergy: batTarget * 0.14,
       enphase: batTarget * 0.09,
@@ -859,9 +860,8 @@ tailwind.config = {
       const p = SOLAR_PRODUCTS[Math.floor(startRng() * SOLAR_PRODUCTS.length)];
       cats.zonne += p.price; brands[p.brand] += p.price; accumulated += p.price;
     }
-    while (accumulated < START) {
+    while (cats.warmte < wpTarget) {
       const p = WP_PRODUCTS[Math.floor(startRng() * WP_PRODUCTS.length)];
-      if (accumulated + p.price > START + 25000) break;
       cats.warmte += p.price; brands[p.brand] += p.price; accumulated += p.price;
     }
     const scale = START / (accumulated || 1);
