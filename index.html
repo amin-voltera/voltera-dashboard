@@ -1,657 +1,727 @@
 <!DOCTYPE html>
-<html lang="en">
+<html class="dark" lang="en">
 <head>
-<meta charset="UTF-8">
+<meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Voltera - Sales Dashboard</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<title>Voltera — Sales Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script>
+tailwind.config = {
+  darkMode: "class",
+  theme: {
+    extend: {
+      colors: {
+        "primary": "#d9ec83",
+        "background-dark": "#0b0e1a",
+      },
+      fontFamily: {
+        "display": ["Inter", "sans-serif"],
+        "heading": ["Space Grotesk", "sans-serif"]
+      },
+      borderRadius: {
+        "DEFAULT": "0.125rem",
+        "lg": "0.25rem",
+        "xl": "0.5rem",
+        "full": "0.75rem"
+      },
+    },
+  },
+}
+</script>
 <style>
-  :root {
-    --lime: #d8ec82;
-    --lime-dim: rgba(216, 236, 130, 0.15);
-    --green: #00b67a;
-    --bg: #060608;
-    --surface: rgba(255, 255, 255, 0.03);
-    --surface-border: rgba(255, 255, 255, 0.06);
-    --surface-hover: rgba(255, 255, 255, 0.05);
-    --text-primary: #f0f0f0;
-    --text-secondary: rgba(255, 255, 255, 0.4);
-    --text-tertiary: rgba(255, 255, 255, 0.2);
-    --blue: #3b82f6;
-    --emerald: #10b981;
-    --orange: #e06030;
-    --violet: #a78bfa;
-    --amber: #eab308;
-    --gold: #f5a623;
-    --red: #ff6b6b;
-    --teal: #00b67a;
-    --purple: #a78bfa;
-    --font-display: 'Outfit', sans-serif;
-    --font-body: 'Plus Jakarta Sans', sans-serif;
-  }
+  body { font-family: 'Inter', sans-serif; }
+  .font-heading { font-family: 'Space Grotesk', sans-serif; }
 
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-
-  body {
-    background: var(--bg);
-    color: var(--text-primary);
-    font-family: var(--font-body);
-    height: 100vh;
-    overflow: hidden;
-    position: relative;
-  }
-
-  /* === Grain texture overlay === */
-  body::before {
-    content: '';
+  /* ── Animated background blobs ── */
+  .scene {
     position: fixed;
     inset: 0;
-    opacity: 0.035;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
-    background-size: 128px;
+    z-index: 0;
+    overflow: hidden;
     pointer-events: none;
+  }
+  .scene__blob {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(80px);
+    opacity: 0.35;
+    animation: blob-drift var(--dur, 18s) ease-in-out infinite alternate;
+  }
+  .scene__blob--1 {
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, #d9ec83, #5ee7df);
+    top: -200px; left: -150px;
+    --dur: 22s;
+  }
+  .scene__blob--2 {
+    width: 500px; height: 500px;
+    background: radial-gradient(circle, #b490f5, #d9ec83);
+    bottom: -200px; right: -100px;
+    --dur: 17s;
+    animation-delay: -8s;
+  }
+  .scene__blob--3 {
+    width: 350px; height: 350px;
+    background: radial-gradient(circle, #5ee7df, #b490f5);
+    top: 40%; left: 50%;
+    --dur: 25s;
+    animation-delay: -13s;
+  }
+  @keyframes blob-drift {
+    0%   { transform: translate(0, 0) scale(1); }
+    33%  { transform: translate(60px, -40px) scale(1.08); }
+    66%  { transform: translate(-40px, 60px) scale(0.94); }
+    100% { transform: translate(30px, 30px) scale(1.04); }
+  }
+
+  /* ── Glass surface base ── */
+  .glass {
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    background: rgba(255, 255, 255, 0.07);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.18);
+    position: relative;
+    overflow: hidden;
+    border-radius: 20px;
+  }
+  .glass::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(255,255,255,0.22) 0%, rgba(255,255,255,0) 50%);
+    pointer-events: none;
+    border-radius: inherit;
     z-index: 1;
   }
 
-  /* === Ambient glow === */
-  body::after {
-    content: '';
-    position: fixed;
-    top: -30%;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 800px;
-    height: 600px;
-    background: radial-gradient(ellipse, rgba(216, 236, 130, 0.06) 0%, transparent 70%);
-    pointer-events: none;
-    z-index: 0;
-  }
-
-  /* === Slides === */
-  .slide {
-    position: absolute;
-    inset: 0;
+  /* ── Glass info card (key metric highlight) ── */
+  .glass-info {
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    background: linear-gradient(135deg, rgba(217,236,131,0.12), rgba(255,255,255,0.05));
+    border: 1px solid rgba(217, 236, 131, 0.28);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.25), 0 0 24px rgba(217,236,131,0.08), inset 0 1px 0 rgba(255,255,255,0.15);
+    border-radius: 20px;
+    padding: 24px;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.36s cubic-bezier(0.22, 0.68, 0, 1.2), box-shadow 0.36s;
+    width: 220px;
+    min-height: 88px;
     display: flex;
     flex-direction: column;
-    align-items: center;
     justify-content: center;
-    opacity: 0;
-    transform: translateY(8px);
-    transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .glass-info::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(217,236,131,0.18) 0%, transparent 50%);
     pointer-events: none;
-    z-index: 2;
+    border-radius: inherit;
+    z-index: 1;
+  }
+  .glass-info:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 16px 48px rgba(0,0,0,0.3), 0 0 32px rgba(217,236,131,0.15), inset 0 1px 0 rgba(255,255,255,0.2);
   }
 
+  /* ── Data card (category/brand items) ── */
+  .data-card {
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 4px 24px rgba(0,0,0,0.18), inset 0 1px 0 rgba(255,255,255,0.1);
+    border-radius: 20px;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.36s cubic-bezier(0.22, 0.68, 0, 1.2), box-shadow 0.36s, border-color 0.3s, background 0.3s;
+  }
+  .data-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0) 50%);
+    pointer-events: none;
+    border-radius: inherit;
+    z-index: 1;
+  }
+  .data-card:hover {
+    transform: translateY(-4px);
+    border-color: rgba(217, 236, 131, 0.3);
+    background: rgba(255, 255, 255, 0.09);
+    box-shadow: 0 16px 48px rgba(0,0,0,0.3), 0 0 20px rgba(217,236,131,0.06);
+  }
+
+  /* ── Data card color variants (chip-style tints) ── */
+  .data-card--aqua {
+    background: rgba(94,231,223,0.08);
+    border-color: rgba(94,231,223,0.22);
+  }
+  .data-card--aqua:hover { border-color: rgba(94,231,223,0.4); box-shadow: 0 16px 48px rgba(0,0,0,0.3), 0 0 20px rgba(94,231,223,0.1); }
+  .data-card--aqua h3 { color: #5ee7df; }
+
+  .data-card--violet {
+    background: rgba(180,144,245,0.08);
+    border-color: rgba(180,144,245,0.22);
+  }
+  .data-card--violet:hover { border-color: rgba(180,144,245,0.4); box-shadow: 0 16px 48px rgba(0,0,0,0.3), 0 0 20px rgba(180,144,245,0.1); }
+  .data-card--violet h3 { color: #b490f5; }
+
+  .data-card--rose {
+    background: rgba(247,168,196,0.08);
+    border-color: rgba(247,168,196,0.22);
+  }
+  .data-card--rose:hover { border-color: rgba(247,168,196,0.4); box-shadow: 0 16px 48px rgba(0,0,0,0.3), 0 0 20px rgba(247,168,196,0.1); }
+  .data-card--rose h3 { color: #f7a8c4; }
+
+  .data-card--amber {
+    background: rgba(255,210,127,0.08);
+    border-color: rgba(255,210,127,0.22);
+  }
+  .data-card--amber:hover { border-color: rgba(255,210,127,0.4); box-shadow: 0 16px 48px rgba(0,0,0,0.3), 0 0 20px rgba(255,210,127,0.1); }
+  .data-card--amber h3 { color: #ffd27f; }
+
+  .data-card--lime {
+    background: rgba(217,236,131,0.08);
+    border-color: rgba(217,236,131,0.22);
+  }
+  .data-card--lime:hover { border-color: rgba(217,236,131,0.4); box-shadow: 0 16px 48px rgba(0,0,0,0.3), 0 0 20px rgba(217,236,131,0.1); }
+  .data-card--lime h3 { color: #d9ec83; }
+
+  /* ── Slides ── */
+  .slide {
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.5s ease;
+  }
   .slide.active {
     opacity: 1;
-    transform: translateY(0);
     pointer-events: auto;
   }
 
-  .container {
-    text-align: center;
-    width: 92%;
-    max-width: 1280px;
-  }
+  /* ── Clip-reveal text animation ── */
+  .clip-reveal { overflow: hidden; }
+  .clip-reveal > * { transform: translateY(110%); }
 
-  /* === Header === */
-  .header { margin-bottom: 48px; }
-
-  .logo { margin-bottom: 28px; }
-  .logo img {
-    height: 28px;
-    filter: brightness(0) invert(1);
-    opacity: 0.7;
-  }
-
-  .header h1 {
-    font-family: var(--font-display);
-    font-size: 1.4rem;
-    font-weight: 400;
-    text-transform: uppercase;
-    letter-spacing: 12px;
-    color: var(--text-secondary);
-    margin-bottom: 6px;
-  }
-
-  .header h2 {
-    font-family: var(--font-body);
-    font-size: 0.85rem;
-    font-weight: 400;
-    color: var(--text-tertiary);
-    letter-spacing: 4px;
-    text-transform: uppercase;
-  }
-
-  .live-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    margin-left: 12px;
-    vertical-align: middle;
-  }
-
-  .live-dot {
-    width: 6px; height: 6px;
-    background: var(--lime);
-    border-radius: 50%;
-    animation: livePulse 2s ease infinite;
-  }
-
-  .live-text {
-    font-family: var(--font-body);
-    font-size: 0.65rem;
-    font-weight: 600;
-    letter-spacing: 3px;
-    text-transform: uppercase;
-    color: var(--lime);
-    opacity: 0.8;
-  }
-
-  @keyframes livePulse {
-    0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(216, 236, 130, 0.6); }
-    50% { opacity: 0.5; box-shadow: 0 0 0 8px rgba(216, 236, 130, 0); }
-  }
-
-  /* === SLIDE 1 — Revenue === */
-  .revenue-number {
-    font-family: var(--font-display);
-    font-size: 8rem;
-    font-weight: 900;
-    letter-spacing: -4px;
-    line-height: 1;
-    color: var(--text-primary);
-    position: relative;
-  }
-
-  .revenue-number::after {
-    content: '';
-    position: absolute;
-    bottom: -4px;
-    left: 10%;
-    right: 10%;
-    height: 2px;
-    background: linear-gradient(90deg, transparent, var(--lime), transparent);
-    opacity: 0.3;
-  }
-
-  .goal-label {
-    font-family: var(--font-body);
-    font-size: 1rem;
-    color: var(--text-tertiary);
-    margin-top: 16px;
-    font-weight: 300;
-    letter-spacing: 2px;
-  }
-
-  .goal-label span {
-    color: var(--text-secondary);
-    font-weight: 500;
-  }
-
-  .revenue-display { margin-bottom: 56px; }
-
-  /* Progress */
-  .progress-track {
-    width: 100%;
-    height: 4px;
-    background: var(--surface);
-    border-radius: 2px;
-    overflow: hidden;
-    margin-bottom: 16px;
-    position: relative;
-  }
-
-  .progress-fill {
-    height: 100%;
-    border-radius: 2px;
-    background: var(--lime);
-    transition: width 1.5s cubic-bezier(0.16, 1, 0.3, 1);
-    position: relative;
-    box-shadow: 0 0 20px rgba(216, 236, 130, 0.4);
-  }
-
-  .progress-fill::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.4) 50%, transparent 100%);
-    animation: shimmer 3s ease infinite;
-  }
-
+  /* ── Progress bar shimmer ── */
   @keyframes shimmer {
     0% { transform: translateX(-100%); }
     100% { transform: translateX(200%); }
   }
 
-  .progress-labels {
+  /* ── Glass Stepper ── */
+  .glass-stepper {
     display: flex;
-    justify-content: space-between;
-    font-family: var(--font-body);
-    font-size: 0.7rem;
-    color: var(--text-tertiary);
-    letter-spacing: 1px;
-  }
-
-  .pct-display {
-    font-family: var(--font-display);
-    font-size: 1.6rem;
-    font-weight: 700;
-    color: var(--lime);
-    margin-bottom: 32px;
-    letter-spacing: -0.5px;
-  }
-
-  .stats-row {
-    display: flex;
+    align-items: center;
     justify-content: center;
-    gap: 100px;
-    margin-top: 56px;
+    padding: 8px 24px;
   }
-
-  .stat-value {
-    font-family: var(--font-display);
-    font-size: 2rem;
-    font-weight: 700;
-    color: var(--text-primary);
-    letter-spacing: -1px;
-  }
-
-  .stat-label {
-    font-family: var(--font-body);
-    font-size: 0.65rem;
-    color: var(--text-tertiary);
-    text-transform: uppercase;
-    letter-spacing: 3px;
-    margin-top: 6px;
-    font-weight: 500;
-  }
-
-  /* === Cards (Distribution + Brand slides) === */
-  .big-total {
-    font-family: var(--font-display);
-    font-size: 3.6rem;
-    font-weight: 800;
-    color: var(--text-primary);
-    margin-bottom: 48px;
-    letter-spacing: -2px;
-  }
-
-  .cards {
+  .glass-step {
     display: flex;
-    justify-content: center;
-    gap: 20px;
+    align-items: center;
+    flex: 0 1 180px;
   }
-
-  .card {
-    flex: 1;
-    max-width: 280px;
-    background: var(--surface);
-    border-radius: 16px;
-    padding: 28px 24px;
-    border: 1px solid var(--surface-border);
-    position: relative;
-    overflow: hidden;
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    transition: background 0.3s ease;
-  }
-
-  .card:hover {
-    background: var(--surface-hover);
-  }
-
-  /* Top accent stripe */
-  .card::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 2px;
-  }
-
-  /* Category accent colors */
-  .cat-batterij::before { background: var(--lime); }
-  .cat-zonne::before { background: var(--gold); }
-  .cat-warmte::before { background: var(--green); }
-
-  /* Brand accent colors */
-  .brand-alphaess::before { background: var(--blue); }
-  .brand-ecoflow::before { background: var(--emerald); }
-  .brand-solarwatt::before { background: var(--orange); }
-  .brand-sigenergy::before { background: var(--violet); }
-  .brand-enphase::before { background: var(--amber); }
-  .brand-jasolar::before { background: var(--gold); }
-  .brand-remeha::before { background: var(--red); }
-  .brand-intergas::before { background: var(--teal); }
-  .brand-hisense::before { background: var(--purple); }
-
-  .card-name {
-    font-family: var(--font-body);
-    font-size: 0.7rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 3px;
-    color: var(--text-secondary);
-    margin-bottom: 20px;
-  }
-
-  .card-pct {
-    font-family: var(--font-display);
-    font-size: 2.6rem;
-    font-weight: 800;
-    line-height: 1;
-    margin-bottom: 4px;
-    letter-spacing: -1px;
-  }
-
-  .cat-batterij .card-pct { color: var(--lime); }
-  .cat-zonne .card-pct { color: var(--gold); }
-  .cat-warmte .card-pct { color: var(--green); }
-  .brand-alphaess .card-pct { color: var(--blue); }
-  .brand-ecoflow .card-pct { color: var(--emerald); }
-  .brand-solarwatt .card-pct { color: var(--orange); }
-  .brand-sigenergy .card-pct { color: var(--violet); }
-  .brand-enphase .card-pct { color: var(--amber); }
-  .brand-jasolar .card-pct { color: var(--gold); }
-  .brand-remeha .card-pct { color: var(--red); }
-  .brand-intergas .card-pct { color: var(--teal); }
-  .brand-hisense .card-pct { color: var(--purple); }
-
-  .card-amount {
-    font-family: var(--font-display);
-    font-size: 1.4rem;
-    font-weight: 600;
-    color: var(--text-primary);
-    margin-bottom: 18px;
-    letter-spacing: -0.5px;
-  }
-
-  .bar-track {
-    width: 100%; height: 3px;
-    background: rgba(255, 255, 255, 0.06);
-    border-radius: 2px;
-    overflow: hidden;
-  }
-
-  .bar-fill {
-    height: 100%;
-    border-radius: 2px;
-    transition: width 1.5s cubic-bezier(0.16, 1, 0.3, 1);
-  }
-
-  .cat-batterij .bar-fill { background: var(--lime); box-shadow: 0 0 12px rgba(216, 236, 130, 0.3); }
-  .cat-zonne .bar-fill { background: var(--gold); box-shadow: 0 0 12px rgba(245, 166, 35, 0.3); }
-  .cat-warmte .bar-fill { background: var(--green); box-shadow: 0 0 12px rgba(0, 182, 122, 0.3); }
-  .brand-alphaess .bar-fill { background: var(--blue); box-shadow: 0 0 12px rgba(59, 130, 246, 0.3); }
-  .brand-ecoflow .bar-fill { background: var(--emerald); box-shadow: 0 0 12px rgba(16, 185, 129, 0.3); }
-  .brand-solarwatt .bar-fill { background: var(--orange); box-shadow: 0 0 12px rgba(224, 96, 48, 0.3); }
-  .brand-sigenergy .bar-fill { background: var(--violet); box-shadow: 0 0 12px rgba(167, 139, 250, 0.3); }
-  .brand-enphase .bar-fill { background: var(--amber); box-shadow: 0 0 12px rgba(234, 179, 8, 0.3); }
-  .brand-jasolar .bar-fill { background: var(--gold); box-shadow: 0 0 12px rgba(245, 166, 35, 0.3); }
-  .brand-remeha .bar-fill { background: var(--red); box-shadow: 0 0 12px rgba(255, 107, 107, 0.3); }
-  .brand-intergas .bar-fill { background: var(--teal); box-shadow: 0 0 12px rgba(0, 182, 122, 0.3); }
-  .brand-hisense .bar-fill { background: var(--purple); box-shadow: 0 0 12px rgba(167, 139, 250, 0.3); }
-
-  .card-target {
-    font-family: var(--font-body);
-    font-size: 0.65rem;
-    color: var(--text-tertiary);
-    margin-top: 12px;
-    letter-spacing: 1px;
-  }
-
-  .card-target span {
-    color: var(--text-secondary);
-    font-weight: 600;
-  }
-
-  /* === Sale popup === */
-  .sale-popup {
-    position: fixed;
-    pointer-events: none;
-    z-index: 50;
-    opacity: 0;
-    transition: all 1.4s cubic-bezier(0.16, 1, 0.3, 1);
-  }
-
-  .sale-popup-amount {
-    font-family: var(--font-display);
-    font-size: 1.8rem;
-    font-weight: 800;
-    color: var(--lime);
-    letter-spacing: -1px;
-  }
-
-  .sale-popup-name {
-    font-family: var(--font-body);
-    font-size: 0.7rem;
-    color: var(--text-secondary);
-    letter-spacing: 1px;
-    margin-top: 2px;
-  }
-
-  /* === Indicators === */
-  .indicators {
-    position: fixed;
-    bottom: 32px;
-    left: 50%;
-    transform: translateX(-50%);
+  .glass-step:last-child { flex: none; }
+  .glass-step__inner {
     display: flex;
+    align-items: center;
     gap: 8px;
-    z-index: 100;
-  }
-
-  .ind {
-    width: 24px; height: 3px;
-    border-radius: 2px;
-    background: rgba(255, 255, 255, 0.1);
-    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
     cursor: pointer;
   }
-
-  .ind:hover {
-    background: rgba(255, 255, 255, 0.2);
+  .glass-step__node {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    border: 1.5px solid rgba(255,255,255,0.15);
+    background: rgba(255,255,255,0.05);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.65rem;
+    font-weight: 500;
+    flex-shrink: 0;
+    transition: all 0.4s cubic-bezier(0.22, 0.68, 0, 1.2);
+    color: rgba(255,255,255,0.4);
+  }
+  .glass-step__label {
+    font-size: 0.7rem;
+    opacity: 0.35;
+    white-space: nowrap;
+    transition: opacity 0.3s, color 0.3s;
+  }
+  .glass-step__connector {
+    flex: 1;
+    height: 1px;
+    margin: 0 6px;
+    background: rgba(255,255,255,0.08);
+    transition: background 0.4s;
+  }
+  .glass-step.is-complete .glass-step__node {
+    background: rgba(217,236,131,0.18);
+    border-color: rgba(217,236,131,0.45);
+    box-shadow: 0 0 10px rgba(217,236,131,0.15);
+    color: #d9ec83;
+  }
+  .glass-step.is-complete .glass-step__connector {
+    background: rgba(217,236,131,0.3);
+  }
+  .glass-step.is-complete .glass-step__label {
+    opacity: 0.5;
+  }
+  .glass-step.is-active .glass-step__node {
+    background: rgba(217,236,131,0.22);
+    border-color: rgba(217,236,131,0.6);
+    box-shadow: 0 0 18px rgba(217,236,131,0.25);
+    animation: step-pulse 2s ease infinite;
+    color: #d9ec83;
+  }
+  .glass-step.is-active .glass-step__label {
+    opacity: 1;
+    font-weight: 500;
+    color: #d9ec83;
+  }
+  @keyframes step-pulse {
+    0%, 100% { box-shadow: 0 0 10px rgba(217,236,131,0.15); }
+    50% { box-shadow: 0 0 22px rgba(217,236,131,0.4); }
   }
 
-  .ind.active {
-    background: var(--lime);
-    width: 40px;
-    box-shadow: 0 0 12px rgba(216, 236, 130, 0.4);
-  }
-
-  /* === Decorative corner marks === */
-  .corner-mark {
+  /* ── Glass Toast (sale notifications) ── */
+  .glass-toast-region {
     position: fixed;
-    width: 40px; height: 40px;
-    z-index: 3;
-    opacity: 0.08;
+    z-index: 50;
+    pointer-events: none;
   }
-  .corner-mark.tl { top: 24px; left: 24px; border-top: 1px solid #fff; border-left: 1px solid #fff; }
-  .corner-mark.tr { top: 24px; right: 24px; border-top: 1px solid #fff; border-right: 1px solid #fff; }
-  .corner-mark.bl { bottom: 24px; left: 24px; border-bottom: 1px solid #fff; border-left: 1px solid #fff; }
-  .corner-mark.br { bottom: 24px; right: 24px; border-bottom: 1px solid #fff; border-right: 1px solid #fff; }
+  .glass-toast {
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    background: rgba(255,255,255,0.07);
+    border: 1px solid rgba(217,236,131,0.3);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.25), 0 0 16px rgba(217,236,131,0.1), inset 0 1px 0 rgba(255,255,255,0.12);
+    border-radius: 16px;
+    padding: 14px 18px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    pointer-events: all;
+    cursor: pointer;
+    animation: toast-float 5s ease both;
+    position: relative;
+    overflow: hidden;
+  }
+  .glass-toast::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(217,236,131,0.06) 0%, transparent 50%);
+    pointer-events: none;
+    border-radius: inherit;
+  }
+  @keyframes toast-float {
+    0%   { opacity: 0; transform: translateY(10px) scale(0.96); }
+    15%  { opacity: 1; transform: translateY(0) scale(1); }
+    75%  { opacity: 1; }
+    100% { opacity: 0; transform: translateY(-10vh); }
+  }
+  .glass-toast__icon {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: rgba(217,236,131,0.12);
+    border: 1px solid rgba(217,236,131,0.25);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.85rem;
+    flex-shrink: 0;
+    color: #d9ec83;
+  }
+  .glass-toast__body { flex: 1; min-width: 0; }
+  .glass-toast__title {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #d9ec83;
+  }
+  .glass-toast__desc {
+    font-size: 0.72rem;
+    opacity: 0.5;
+    margin-top: 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .glass-toast__close {
+    opacity: 0.35;
+    font-size: 0.7rem;
+    flex-shrink: 0;
+    transition: opacity 0.2s;
+  }
+  .glass-toast:hover .glass-toast__close { opacity: 0.8; }
+
+  /* ── Progress bar glass treatment ── */
+  .progress-track {
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+  }
 </style>
 </head>
-<body>
+<body class="bg-[#0b0e1a] text-slate-100 h-screen flex flex-col overflow-hidden">
 
-<!-- Decorative corners -->
-<div class="corner-mark tl"></div>
-<div class="corner-mark tr"></div>
-<div class="corner-mark bl"></div>
-<div class="corner-mark br"></div>
+<!-- Animated background blobs -->
+<div class="scene" aria-hidden="true">
+  <div class="scene__blob scene__blob--1"></div>
+  <div class="scene__blob scene__blob--2"></div>
+  <div class="scene__blob scene__blob--3"></div>
+</div>
 
-<!-- SLIDE 1 — Revenue Goal -->
-<div class="slide active" id="slide-revenue">
-  <div class="container">
-    <div class="header">
-      <div class="logo"><img src="https://voltera.nl/voltera-logo.png" alt="Voltera"></div>
-      <h1>Monthly Revenue <span class="live-badge"><span class="live-dot"></span><span class="live-text">Live</span></span></h1>
-      <h2>March 2026</h2>
-    </div>
-    <div class="revenue-display">
-      <div class="revenue-number" id="revenue">-</div>
-      <div class="goal-label">Target <span>€26,000,000</span></div>
-    </div>
-    <div class="pct-display" id="percentage">-</div>
-    <div class="progress-track">
-      <div class="progress-fill" id="progressBar" style="width: 0%"></div>
-    </div>
-    <div class="progress-labels">
-      <span>€0</span><span>€6.5M</span><span>€13M</span><span>€19.5M</span><span>€26M</span>
-    </div>
-    <div class="stats-row">
-      <div>
-        <div class="stat-value" id="remaining">-</div>
-        <div class="stat-label">Remaining</div>
+<!-- Logo + Live badge (floating overlay, centered) -->
+<div class="fixed top-6 left-1/2 -translate-x-1/2 z-40 flex flex-col items-center gap-1">
+  <img src="https://voltera.nl/voltera-logo.png" alt="Voltera" class="h-[72px]" style="filter: brightness(0) invert(88%) sepia(30%) saturate(600%) hue-rotate(30deg);">
+  <div class="flex items-center gap-2">
+    <span class="relative flex h-2 w-2">
+      <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+      <span class="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
+    </span>
+    <span class="text-xs font-medium text-primary tracking-widest uppercase">Live</span>
+  </div>
+</div>
+
+<!-- Slide Area -->
+<main class="flex-1 relative overflow-hidden" style="z-index: 10;">
+
+  <!-- SLIDE 1: Revenue Goal -->
+  <div id="slide-revenue" class="slide active absolute inset-0 flex flex-col items-center justify-center px-4 md:px-10 py-8">
+    <div class="max-w-6xl mx-auto w-full">
+      <div class="w-full mb-10">
+        <div class="flex flex-col md:flex-row md:items-start justify-between gap-4">
+          <div class="space-y-2">
+            <div class="clip-reveal"><span class="block text-primary font-heading font-semibold tracking-widest text-sm uppercase">Slide 01 — Monthly Target</span></div>
+            <div class="clip-reveal"><h1 class="text-4xl md:text-6xl font-heading font-bold tracking-tight">Revenue Goal</h1></div>
+            <div class="clip-reveal"><p class="text-slate-400 text-lg">Monthly revenue progress toward &euro;16M target for March 2026.</p></div>
+          </div>
+          <div class="clip-reveal"><div class="glass-info min-w-[200px]">
+            <div class="flex flex-col items-start relative z-10">
+              <span class="text-slate-400 text-sm font-medium">Progress</span>
+              <span class="text-3xl font-heading font-bold text-primary mt-1" id="percentage">-</span>
+            </div>
+          </div></div>
+        </div>
       </div>
-      <div>
-        <div class="stat-value" id="today">-</div>
-        <div class="stat-label">Today's Revenue</div>
+      <div class="clip-reveal text-center mb-10">
+        <div class="text-7xl md:text-8xl font-heading font-bold tracking-tighter" id="revenue">-</div>
+      </div>
+      <div class="clip-reveal w-full mb-3">
+        <div>
+          <div class="w-full progress-track h-2.5 rounded-full overflow-hidden">
+            <div class="bg-primary h-full rounded-full transition-all duration-1000 relative" id="progressBar" style="width: 0%">
+              <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent" style="animation: shimmer 3s ease infinite;"></div>
+            </div>
+          </div>
+          <div class="flex justify-between text-xs text-slate-500 mt-2 font-medium">
+            <span>&euro;0</span><span>&euro;4M</span><span>&euro;8M</span><span>&euro;12M</span><span>&euro;16M</span>
+          </div>
+        </div>
+      </div>
+      <div class="clip-reveal"><div class="grid grid-cols-2 gap-6 mt-8">
+        <div class="data-card p-6 flex flex-col">
+          <span class="text-slate-400 text-sm font-medium relative z-10">Remaining</span>
+          <span class="text-2xl font-heading font-bold mt-1 relative z-10" id="remaining">-</span>
+        </div>
+        <div class="data-card p-6 flex flex-col">
+          <span class="text-slate-400 text-sm font-medium relative z-10">Today's Revenue</span>
+          <span class="text-2xl font-heading font-bold text-primary mt-1 relative z-10" id="today">-</span>
+        </div>
+      </div></div>
+    </div>
+  </div>
+
+  <!-- SLIDE 2: Distribution -->
+  <div id="slide-distribution" class="slide absolute inset-0 flex flex-col items-center justify-center px-4 md:px-10 py-8">
+    <div class="max-w-6xl mx-auto w-full">
+      <div class="w-full mb-10">
+        <div class="flex flex-col md:flex-row md:items-start justify-between gap-4">
+          <div class="space-y-2">
+            <div class="clip-reveal"><span class="block text-primary font-heading font-semibold tracking-widest text-sm uppercase">Slide 02 — Category Breakdown</span></div>
+            <div class="clip-reveal"><h1 class="text-4xl md:text-6xl font-heading font-bold tracking-tight">Revenue Distribution</h1></div>
+            <div class="clip-reveal"><p class="text-slate-400 text-lg">Revenue breakdown by product category.</p></div>
+          </div>
+          <div class="clip-reveal"><div class="glass-info min-w-[200px]">
+            <div class="flex flex-col items-start relative z-10">
+              <span class="text-slate-400 text-sm font-medium">Total Revenue</span>
+              <span class="text-3xl font-heading font-bold text-primary mt-1" id="distTotal">-</span>
+            </div>
+          </div></div>
+        </div>
+      </div>
+      <div class="clip-reveal"><div class="grid grid-cols-1 md:grid-cols-3 gap-6 w-full">
+        <div class="data-card data-card--aqua flex flex-col p-8">
+          <h3 class="text-xl font-heading font-bold mb-6 relative z-10">Home Batteries</h3>
+          <div class="mt-auto space-y-4 relative z-10">
+            <div class="flex justify-between items-end">
+              <span class="text-3xl font-heading font-bold" id="amtBatterij">-</span>
+              <span class="text-primary font-bold" id="pctBatterij">-</span>
+            </div>
+            <div class="w-full bg-white/[0.08] h-2.5 rounded-full overflow-hidden">
+              <div class="bg-primary h-full rounded-full transition-all duration-1000" id="barBatterij" style="width:0%"></div>
+            </div>
+            <div class="text-slate-500 text-xs">Target <span class="text-slate-300 font-semibold" id="goalBatterij">-</span></div>
+          </div>
+        </div>
+        <div class="data-card data-card--amber flex flex-col p-8">
+          <h3 class="text-xl font-heading font-bold mb-6 relative z-10">Solar Panels</h3>
+          <div class="mt-auto space-y-4 relative z-10">
+            <div class="flex justify-between items-end">
+              <span class="text-3xl font-heading font-bold" id="amtZonne">-</span>
+              <span class="text-primary font-bold" id="pctZonne">-</span>
+            </div>
+            <div class="w-full bg-white/[0.08] h-2.5 rounded-full overflow-hidden">
+              <div class="bg-primary h-full rounded-full transition-all duration-1000" id="barZonne" style="width:0%"></div>
+            </div>
+            <div class="text-slate-500 text-xs">Target <span class="text-slate-300 font-semibold" id="goalZonne">-</span></div>
+          </div>
+        </div>
+        <div class="data-card data-card--rose flex flex-col p-8">
+          <h3 class="text-xl font-heading font-bold mb-6 relative z-10">Hybrid Heat Pumps</h3>
+          <div class="mt-auto space-y-4 relative z-10">
+            <div class="flex justify-between items-end">
+              <span class="text-3xl font-heading font-bold" id="amtWarmte">-</span>
+              <span class="text-primary font-bold" id="pctWarmte">-</span>
+            </div>
+            <div class="w-full bg-white/[0.08] h-2.5 rounded-full overflow-hidden">
+              <div class="bg-primary h-full rounded-full transition-all duration-1000" id="barWarmte" style="width:0%"></div>
+            </div>
+            <div class="text-slate-500 text-xs">Target <span class="text-slate-300 font-semibold" id="goalWarmte">-</span></div>
+          </div>
+        </div>
+      </div></div>
+    </div>
+  </div>
+
+  <!-- SLIDE 3: Home Batteries by brand -->
+  <div id="slide-batterij" class="slide absolute inset-0 flex flex-col items-center justify-center px-4 md:px-10 py-8">
+    <div class="max-w-6xl mx-auto w-full">
+      <div class="w-full mb-10">
+        <div class="flex flex-col md:flex-row md:items-start justify-between gap-4">
+          <div class="space-y-2">
+            <div class="clip-reveal"><span class="block text-primary font-heading font-semibold tracking-widest text-sm uppercase">Slide 03 — Home Batteries</span></div>
+            <div class="clip-reveal"><h1 class="text-4xl md:text-6xl font-heading font-bold tracking-tight">Battery Revenue</h1></div>
+            <div class="clip-reveal"><p class="text-slate-400 text-lg">Revenue per brand for home battery systems.</p></div>
+          </div>
+          <div class="clip-reveal"><div class="glass-info min-w-[200px]">
+            <div class="flex flex-col items-start relative z-10">
+              <span class="text-slate-400 text-sm font-medium">Category Total</span>
+              <span class="text-3xl font-heading font-bold text-primary mt-1" id="batTotal">-</span>
+            </div>
+          </div></div>
+        </div>
+      </div>
+      <div class="clip-reveal"><div class="grid grid-cols-2 md:grid-cols-5 gap-4 w-full">
+        <div class="data-card data-card--aqua flex flex-col p-6">
+          <h3 class="text-base font-heading font-bold mb-4 relative z-10">AlphaESS</h3>
+          <div class="mt-auto space-y-3 relative z-10">
+            <span class="text-2xl font-heading font-bold block" id="amtAlphaess">-</span>
+            <span class="text-primary font-bold text-sm" id="pctAlphaess">-</span>
+            <div class="w-full bg-white/[0.08] h-2 rounded-full overflow-hidden">
+              <div class="bg-primary h-full rounded-full transition-all duration-1000" id="barAlphaess" style="width:0%"></div>
+            </div>
+          </div>
+        </div>
+        <div class="data-card data-card--lime flex flex-col p-6">
+          <h3 class="text-base font-heading font-bold mb-4 relative z-10">EcoFlow</h3>
+          <div class="mt-auto space-y-3 relative z-10">
+            <span class="text-2xl font-heading font-bold block" id="amtEcoflow">-</span>
+            <span class="text-primary font-bold text-sm" id="pctEcoflow">-</span>
+            <div class="w-full bg-white/[0.08] h-2 rounded-full overflow-hidden">
+              <div class="bg-primary h-full rounded-full transition-all duration-1000" id="barEcoflow" style="width:0%"></div>
+            </div>
+          </div>
+        </div>
+        <div class="data-card data-card--violet flex flex-col p-6">
+          <h3 class="text-base font-heading font-bold mb-4 relative z-10">Solarwatt</h3>
+          <div class="mt-auto space-y-3 relative z-10">
+            <span class="text-2xl font-heading font-bold block" id="amtSolarwatt">-</span>
+            <span class="text-primary font-bold text-sm" id="pctSolarwatt">-</span>
+            <div class="w-full bg-white/[0.08] h-2 rounded-full overflow-hidden">
+              <div class="bg-primary h-full rounded-full transition-all duration-1000" id="barSolarwatt" style="width:0%"></div>
+            </div>
+          </div>
+        </div>
+        <div class="data-card data-card--amber flex flex-col p-6">
+          <h3 class="text-base font-heading font-bold mb-4 relative z-10">Sigenergy</h3>
+          <div class="mt-auto space-y-3 relative z-10">
+            <span class="text-2xl font-heading font-bold block" id="amtSigenergy">-</span>
+            <span class="text-primary font-bold text-sm" id="pctSigenergy">-</span>
+            <div class="w-full bg-white/[0.08] h-2 rounded-full overflow-hidden">
+              <div class="bg-primary h-full rounded-full transition-all duration-1000" id="barSigenergy" style="width:0%"></div>
+            </div>
+          </div>
+        </div>
+        <div class="data-card data-card--rose flex flex-col p-6">
+          <h3 class="text-base font-heading font-bold mb-4 relative z-10">Enphase</h3>
+          <div class="mt-auto space-y-3 relative z-10">
+            <span class="text-2xl font-heading font-bold block" id="amtEnphase">-</span>
+            <span class="text-primary font-bold text-sm" id="pctEnphase">-</span>
+            <div class="w-full bg-white/[0.08] h-2 rounded-full overflow-hidden">
+              <div class="bg-primary h-full rounded-full transition-all duration-1000" id="barEnphase" style="width:0%"></div>
+            </div>
+          </div>
+        </div>
+      </div></div>
+    </div>
+  </div>
+
+  <!-- SLIDE 4: Solar Panels by brand -->
+  <div id="slide-zonne" class="slide absolute inset-0 flex flex-col items-center justify-center px-4 md:px-10 py-8">
+    <div class="max-w-6xl mx-auto w-full">
+      <div class="w-full mb-10">
+        <div class="flex flex-col md:flex-row md:items-start justify-between gap-4">
+          <div class="space-y-2">
+            <div class="clip-reveal"><span class="block text-primary font-heading font-semibold tracking-widest text-sm uppercase">Slide 04 — Solar Panels</span></div>
+            <div class="clip-reveal"><h1 class="text-4xl md:text-6xl font-heading font-bold tracking-tight">Solar Revenue</h1></div>
+            <div class="clip-reveal"><p class="text-slate-400 text-lg">Revenue per brand for solar panel installations.</p></div>
+          </div>
+          <div class="clip-reveal"><div class="glass-info min-w-[200px]">
+            <div class="flex flex-col items-start relative z-10">
+              <span class="text-slate-400 text-sm font-medium">Category Total</span>
+              <span class="text-3xl font-heading font-bold text-primary mt-1" id="zonTotal">-</span>
+            </div>
+          </div></div>
+        </div>
+      </div>
+      <div class="clip-reveal"><div class="grid grid-cols-1 gap-6 w-full max-w-md">
+        <div class="data-card data-card--amber flex flex-col p-8">
+          <h3 class="text-xl font-heading font-bold mb-6 relative z-10">JA Solar</h3>
+          <div class="mt-auto space-y-4 relative z-10">
+            <div class="flex justify-between items-end">
+              <span class="text-3xl font-heading font-bold" id="amtJasolar">-</span>
+              <span class="text-primary font-bold" id="pctJasolar">-</span>
+            </div>
+            <div class="w-full bg-white/[0.08] h-2.5 rounded-full overflow-hidden">
+              <div class="bg-primary h-full rounded-full transition-all duration-1000" id="barJasolar" style="width:0%"></div>
+            </div>
+          </div>
+        </div>
+      </div></div>
+    </div>
+  </div>
+
+  <!-- SLIDE 5: Hybrid Heat Pumps by brand -->
+  <div id="slide-warmte" class="slide absolute inset-0 flex flex-col items-center justify-center px-4 md:px-10 py-8">
+    <div class="max-w-6xl mx-auto w-full">
+      <div class="w-full mb-10">
+        <div class="flex flex-col md:flex-row md:items-start justify-between gap-4">
+          <div class="space-y-2">
+            <div class="clip-reveal"><span class="block text-primary font-heading font-semibold tracking-widest text-sm uppercase">Slide 05 — Hybrid Heat Pumps</span></div>
+            <div class="clip-reveal"><h1 class="text-4xl md:text-6xl font-heading font-bold tracking-tight">Heat Pump Revenue</h1></div>
+            <div class="clip-reveal"><p class="text-slate-400 text-lg">Revenue per brand for hybrid heat pump systems.</p></div>
+          </div>
+          <div class="clip-reveal"><div class="glass-info min-w-[200px]">
+            <div class="flex flex-col items-start relative z-10">
+              <span class="text-slate-400 text-sm font-medium">Category Total</span>
+              <span class="text-3xl font-heading font-bold text-primary mt-1" id="wpTotal">-</span>
+            </div>
+          </div></div>
+        </div>
+      </div>
+      <div class="clip-reveal"><div class="grid grid-cols-1 md:grid-cols-3 gap-6 w-full">
+        <div class="data-card data-card--rose flex flex-col p-8">
+          <h3 class="text-xl font-heading font-bold mb-6 relative z-10">Remeha</h3>
+          <div class="mt-auto space-y-4 relative z-10">
+            <div class="flex justify-between items-end">
+              <span class="text-3xl font-heading font-bold" id="amtRemeha">-</span>
+              <span class="text-primary font-bold" id="pctRemeha">-</span>
+            </div>
+            <div class="w-full bg-white/[0.08] h-2.5 rounded-full overflow-hidden">
+              <div class="bg-primary h-full rounded-full transition-all duration-1000" id="barRemeha" style="width:0%"></div>
+            </div>
+          </div>
+        </div>
+        <div class="data-card data-card--aqua flex flex-col p-8">
+          <h3 class="text-xl font-heading font-bold mb-6 relative z-10">Intergas</h3>
+          <div class="mt-auto space-y-4 relative z-10">
+            <div class="flex justify-between items-end">
+              <span class="text-3xl font-heading font-bold" id="amtIntergas">-</span>
+              <span class="text-primary font-bold" id="pctIntergas">-</span>
+            </div>
+            <div class="w-full bg-white/[0.08] h-2.5 rounded-full overflow-hidden">
+              <div class="bg-primary h-full rounded-full transition-all duration-1000" id="barIntergas" style="width:0%"></div>
+            </div>
+          </div>
+        </div>
+        <div class="data-card data-card--violet flex flex-col p-8">
+          <h3 class="text-xl font-heading font-bold mb-6 relative z-10">Hisense</h3>
+          <div class="mt-auto space-y-4 relative z-10">
+            <div class="flex justify-between items-end">
+              <span class="text-3xl font-heading font-bold" id="amtHisense">-</span>
+              <span class="text-primary font-bold" id="pctHisense">-</span>
+            </div>
+            <div class="w-full bg-white/[0.08] h-2.5 rounded-full overflow-hidden">
+              <div class="bg-primary h-full rounded-full transition-all duration-1000" id="barHisense" style="width:0%"></div>
+            </div>
+          </div>
+        </div>
+      </div></div>
+    </div>
+  </div>
+
+</main>
+
+<!-- Glass Stepper -->
+<div class="relative py-3" style="z-index: 10;">
+  <div class="glass-stepper" id="stepper">
+    <div class="glass-step is-active" data-step="0">
+      <div class="glass-step__inner">
+        <div class="glass-step__node">1</div>
+        <span class="glass-step__label">Revenue</span>
+      </div>
+      <div class="glass-step__connector"></div>
+    </div>
+    <div class="glass-step" data-step="1">
+      <div class="glass-step__inner">
+        <div class="glass-step__node">2</div>
+        <span class="glass-step__label">Distribution</span>
+      </div>
+      <div class="glass-step__connector"></div>
+    </div>
+    <div class="glass-step" data-step="2">
+      <div class="glass-step__inner">
+        <div class="glass-step__node">3</div>
+        <span class="glass-step__label">Batteries</span>
+      </div>
+      <div class="glass-step__connector"></div>
+    </div>
+    <div class="glass-step" data-step="3">
+      <div class="glass-step__inner">
+        <div class="glass-step__node">4</div>
+        <span class="glass-step__label">Solar</span>
+      </div>
+      <div class="glass-step__connector"></div>
+    </div>
+    <div class="glass-step" data-step="4">
+      <div class="glass-step__inner">
+        <div class="glass-step__node">5</div>
+        <span class="glass-step__label">Heat Pumps</span>
       </div>
     </div>
   </div>
 </div>
 
-<!-- SLIDE 2 — Distribution -->
-<div class="slide" id="slide-distribution">
-  <div class="container">
-    <div class="header">
-      <div class="logo"><img src="https://voltera.nl/voltera-logo.png" alt="Voltera"></div>
-      <h1>Revenue Distribution <span class="live-badge"><span class="live-dot"></span><span class="live-text">Live</span></span></h1>
-      <h2>March 2026</h2>
-    </div>
-    <div class="big-total" id="distTotal">-</div>
-    <div class="cards">
-      <div class="card cat-batterij">
-        <div class="card-name">Home Batteries</div>
-        <div class="card-pct" id="pctBatterij">-</div>
-        <div class="card-amount" id="amtBatterij">-</div>
-        <div class="bar-track"><div class="bar-fill" id="barBatterij" style="width:0%"></div></div>
-        <div class="card-target">Target <span id="goalBatterij">-</span></div>
-      </div>
-      <div class="card cat-zonne">
-        <div class="card-name">Solar Panels</div>
-        <div class="card-pct" id="pctZonne">-</div>
-        <div class="card-amount" id="amtZonne">-</div>
-        <div class="bar-track"><div class="bar-fill" id="barZonne" style="width:0%"></div></div>
-        <div class="card-target">Target <span id="goalZonne">-</span></div>
-      </div>
-      <div class="card cat-warmte">
-        <div class="card-name">Hybrid Heat Pumps</div>
-        <div class="card-pct" id="pctWarmte">-</div>
-        <div class="card-amount" id="amtWarmte">-</div>
-        <div class="bar-track"><div class="bar-fill" id="barWarmte" style="width:0%"></div></div>
-        <div class="card-target">Target <span id="goalWarmte">-</span></div>
-      </div>
-    </div>
-  </div>
-</div>
+<!-- Toast region for sale notifications -->
+<div class="glass-toast-region" id="toast-region"></div>
 
-<!-- SLIDE 3 — Home Batteries by brand -->
-<div class="slide" id="slide-batterij">
-  <div class="container">
-    <div class="header">
-      <div class="logo"><img src="https://voltera.nl/voltera-logo.png" alt="Voltera"></div>
-      <h1>Home Batteries <span class="live-badge"><span class="live-dot"></span><span class="live-text">Live</span></span></h1>
-      <h2>Revenue per Brand</h2>
-    </div>
-    <div class="big-total" id="batTotal">-</div>
-    <div class="cards">
-      <div class="card brand-alphaess">
-        <div class="card-name">AlphaESS</div>
-        <div class="card-pct" id="pctAlphaess">-</div>
-        <div class="card-amount" id="amtAlphaess">-</div>
-        <div class="bar-track"><div class="bar-fill" id="barAlphaess" style="width:0%"></div></div>
-      </div>
-      <div class="card brand-ecoflow">
-        <div class="card-name">EcoFlow</div>
-        <div class="card-pct" id="pctEcoflow">-</div>
-        <div class="card-amount" id="amtEcoflow">-</div>
-        <div class="bar-track"><div class="bar-fill" id="barEcoflow" style="width:0%"></div></div>
-      </div>
-      <div class="card brand-solarwatt">
-        <div class="card-name">Solarwatt</div>
-        <div class="card-pct" id="pctSolarwatt">-</div>
-        <div class="card-amount" id="amtSolarwatt">-</div>
-        <div class="bar-track"><div class="bar-fill" id="barSolarwatt" style="width:0%"></div></div>
-      </div>
-      <div class="card brand-sigenergy">
-        <div class="card-name">Sigenergy</div>
-        <div class="card-pct" id="pctSigenergy">-</div>
-        <div class="card-amount" id="amtSigenergy">-</div>
-        <div class="bar-track"><div class="bar-fill" id="barSigenergy" style="width:0%"></div></div>
-      </div>
-      <div class="card brand-enphase">
-        <div class="card-name">Enphase</div>
-        <div class="card-pct" id="pctEnphase">-</div>
-        <div class="card-amount" id="amtEnphase">-</div>
-        <div class="bar-track"><div class="bar-fill" id="barEnphase" style="width:0%"></div></div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- SLIDE 4 — Solar Panels by brand -->
-<div class="slide" id="slide-zonne">
-  <div class="container">
-    <div class="header">
-      <div class="logo"><img src="https://voltera.nl/voltera-logo.png" alt="Voltera"></div>
-      <h1>Solar Panels <span class="live-badge"><span class="live-dot"></span><span class="live-text">Live</span></span></h1>
-      <h2>Revenue per Brand</h2>
-    </div>
-    <div class="big-total" id="zonTotal">-</div>
-    <div class="cards">
-      <div class="card brand-jasolar">
-        <div class="card-name">JA Solar</div>
-        <div class="card-pct" id="pctJasolar">-</div>
-        <div class="card-amount" id="amtJasolar">-</div>
-        <div class="bar-track"><div class="bar-fill" id="barJasolar" style="width:0%"></div></div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- SLIDE 5 — Hybrid Heat Pumps by brand -->
-<div class="slide" id="slide-warmte">
-  <div class="container">
-    <div class="header">
-      <div class="logo"><img src="https://voltera.nl/voltera-logo.png" alt="Voltera"></div>
-      <h1>Hybrid Heat Pumps <span class="live-badge"><span class="live-dot"></span><span class="live-text">Live</span></span></h1>
-      <h2>Revenue per Brand</h2>
-    </div>
-    <div class="big-total" id="wpTotal">-</div>
-    <div class="cards">
-      <div class="card brand-remeha">
-        <div class="card-name">Remeha</div>
-        <div class="card-pct" id="pctRemeha">-</div>
-        <div class="card-amount" id="amtRemeha">-</div>
-        <div class="bar-track"><div class="bar-fill" id="barRemeha" style="width:0%"></div></div>
-      </div>
-      <div class="card brand-intergas">
-        <div class="card-name">Intergas</div>
-        <div class="card-pct" id="pctIntergas">-</div>
-        <div class="card-amount" id="amtIntergas">-</div>
-        <div class="bar-track"><div class="bar-fill" id="barIntergas" style="width:0%"></div></div>
-      </div>
-      <div class="card brand-hisense">
-        <div class="card-name">Hisense</div>
-        <div class="card-pct" id="pctHisense">-</div>
-        <div class="card-amount" id="amtHisense">-</div>
-        <div class="bar-track"><div class="bar-fill" id="barHisense" style="width:0%"></div></div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- Slide indicators -->
-<div class="indicators" id="indicators"></div>
 
 <script>
   // === Config ===
-  const GOAL = 26_000_000;
-  const START = 11_847_362;
-  const INTERVAL_MS = 5 * 60 * 1000;
+  const GOAL = 16_000_000;
+  const START = 7_284_000;
+  // ~6 sales/hour → ~€44K/hr → ~€533K/day → €16M/month
+  const INTERVAL_MS = 10 * 60 * 1000;
 
   const PRODUCTS = [
     { brand: 'alphaess', cat: 'batterij', name: 'AlphaESS 11.4 kWh 5kW 1-fase', price: 7500 },
@@ -669,7 +739,6 @@
     { brand: 'alphaess', cat: 'batterij', name: 'Alpha ESS 27.9 kWh 3-fase', price: 11500 },
     { brand: 'alphaess', cat: 'batterij', name: 'Alpha ESS 37.2 kWh 3-fase', price: 13300 },
     { brand: 'alphaess', cat: 'batterij', name: 'Alpha ESS 46.5 kWh 3-fase', price: 14800 },
-    { brand: 'alphaess', cat: 'batterij', name: 'Alpha ESS Laadpaal', price: 1000 },
     { brand: 'alphaess', cat: 'batterij', name: 'Alpha ESS Back-up Box', price: 2000 },
     { brand: 'ecoflow', cat: 'batterij', name: 'EcoFlow Stream Pro 1.92kWh', price: 1600 },
     { brand: 'ecoflow', cat: 'batterij', name: 'EcoFlow Stream UltraX 3.84kWh', price: 1900 },
@@ -710,13 +779,47 @@
     };
   }
 
-  function pickProduct(rng) {
-    if (rng() < 0.60) {
-      return ALPHAESS_PRODUCTS[Math.floor(rng() * ALPHAESS_PRODUCTS.length)];
+  const PRODUCTS_BY_CAT = {
+    batterij: PRODUCTS.filter(p => p.cat === 'batterij'),
+    zonne: PRODUCTS.filter(p => p.cat === 'zonne'),
+    warmte: PRODUCTS.filter(p => p.cat === 'warmte'),
+  };
+
+  function pickSale(rng) {
+    var items = [];
+    // Primary product: 50% AlphaESS, 50% other
+    if (rng() < 0.50) {
+      items.push(ALPHAESS_PRODUCTS[Math.floor(rng() * ALPHAESS_PRODUCTS.length)]);
     } else {
-      return OTHER_PRODUCTS[Math.floor(rng() * OTHER_PRODUCTS.length)];
+      items.push(OTHER_PRODUCTS[Math.floor(rng() * OTHER_PRODUCTS.length)]);
     }
+    // 25% chance customer adds a second product from a different category
+    if (rng() < 0.25) {
+      var usedCats = items.map(function(p) { return p.cat; });
+      var availCats = ['batterij', 'zonne', 'warmte'].filter(function(c) { return usedCats.indexOf(c) === -1; });
+      if (availCats.length > 0) {
+        var cat2 = availCats[Math.floor(rng() * availCats.length)];
+        items.push(PRODUCTS_BY_CAT[cat2][Math.floor(rng() * PRODUCTS_BY_CAT[cat2].length)]);
+      }
+      // 20% of combo buyers add a third category
+      if (rng() < 0.20) {
+        usedCats = items.map(function(p) { return p.cat; });
+        availCats = ['batterij', 'zonne', 'warmte'].filter(function(c) { return usedCats.indexOf(c) === -1; });
+        if (availCats.length > 0) {
+          var cat3 = availCats[0];
+          items.push(PRODUCTS_BY_CAT[cat3][Math.floor(rng() * PRODUCTS_BY_CAT[cat3].length)]);
+        }
+      }
+    }
+    return items;
   }
+
+  // Brand-grouped products for even initial distribution
+  const BAT_BRANDS = ['alphaess', 'ecoflow', 'solarwatt', 'sigenergy', 'enphase'];
+  const BAT_BY_BRAND = {};
+  BAT_BRANDS.forEach(function(b) {
+    BAT_BY_BRAND[b] = PRODUCTS.filter(function(p) { return p.cat === 'batterij' && p.brand === b; });
+  });
 
   function getState() {
     const elapsed = Date.now() - REF;
@@ -729,15 +832,26 @@
     };
 
     const startRng = mulberry32(999);
-    const BAT_PRODUCTS = PRODUCTS.filter(p => p.cat === 'batterij');
     const SOLAR_PRODUCTS = PRODUCTS.filter(p => p.cat === 'zonne');
     const WP_PRODUCTS = PRODUCTS.filter(p => p.cat === 'warmte');
-    const batTarget = START * (0.63 + startRng() * 0.04);
-    const solTarget = START * (0.045 + startRng() * 0.015);
+    const batTarget = START * (0.58 + startRng() * 0.04);
+    const solTarget = START * (0.04 + startRng() * 0.02);
     let accumulated = 0;
-    while (cats.batterij < batTarget) {
-      const p = BAT_PRODUCTS[Math.floor(startRng() * BAT_PRODUCTS.length)];
-      cats.batterij += p.price; brands[p.brand] += p.price; accumulated += p.price;
+    // Fill each battery brand to its revenue target
+    const batBrandTargets = {
+      ecoflow: batTarget * 0.35,
+      alphaess: batTarget * 0.20,
+      solarwatt: batTarget * 0.22,
+      sigenergy: batTarget * 0.14,
+      enphase: batTarget * 0.09,
+    };
+    for (const brand of BAT_BRANDS) {
+      const target = batBrandTargets[brand] || 0;
+      const brandProducts = BAT_BY_BRAND[brand];
+      while (brands[brand] < target) {
+        const p = brandProducts[Math.floor(startRng() * brandProducts.length)];
+        cats.batterij += p.price; brands[p.brand] += p.price; accumulated += p.price;
+      }
     }
     while (cats.zonne < solTarget) {
       const p = SOLAR_PRODUCTS[Math.floor(startRng() * SOLAR_PRODUCTS.length)];
@@ -753,22 +867,24 @@
     for (const b of Object.keys(brands)) brands[b] *= scale;
 
     let todayRev = 0;
-    let lastProduct = null;
+    let lastSale = null;
     for (let i = 0; i < intervals; i++) {
       const rng = mulberry32(i + 42);
-      const product = pickProduct(rng);
-      todayRev += product.price;
-      cats[product.cat] += product.price;
-      brands[product.brand] += product.price;
-      lastProduct = product;
+      const sale = pickSale(rng);
+      for (const product of sale) {
+        todayRev += product.price;
+        cats[product.cat] += product.price;
+        brands[product.brand] += product.price;
+      }
+      lastSale = sale;
     }
 
     const revenue = Object.values(cats).reduce((a, b) => a + b, 0);
-    return { revenue, todayRev, intervals, cats, brands, lastProduct };
+    return { revenue, todayRev, intervals, cats, brands, lastSale };
   }
 
   function formatEuro(n) {
-    return '€' + Math.round(n).toLocaleString('en-US');
+    return '\u20AC' + Math.round(n).toLocaleString('en-US');
   }
 
   function pctStr(part, total) {
@@ -855,8 +971,10 @@
         animatePct(document.getElementById('pct' + cap), prev.brands[b], prev.cats.warmte, brands[b], cats.warmte);
       }
 
-      if (state.lastProduct) {
-        showPopup(state.lastProduct.price, state.lastProduct.name);
+      if (state.lastSale && state.lastSale.length > 0) {
+        var saleTotal = state.lastSale.reduce(function(s, p) { return s + p.price; }, 0);
+        var saleDesc = state.lastSale.map(function(p) { return p.name.split(' ')[0]; }).join(' + ');
+        showToast(saleTotal, saleDesc);
       }
     } else {
       setVal('revenue', formatEuro(revenue));
@@ -915,42 +1033,105 @@
     prev = { revenue, todayRev, cats: { ...cats }, brands: { ...brands } };
   }
 
-  function showPopup(amount, name) {
-    const popup = document.createElement('div');
-    popup.className = 'sale-popup';
-    popup.innerHTML = `<div class="sale-popup-amount">+${formatEuro(amount)}</div><div class="sale-popup-name">${name}</div>`;
-    popup.style.left = (25 + Math.random() * 50) + '%';
-    popup.style.top = '40%';
-    popup.style.opacity = '1';
-    document.body.appendChild(popup);
-    requestAnimationFrame(() => {
-      popup.style.top = '20%';
-      popup.style.opacity = '0';
-    });
-    setTimeout(() => popup.remove(), 1800);
+  function showToast(amount, name) {
+    var region = document.getElementById('toast-region');
+    if (!region) return;
+    // Find the active slide's glass-info card
+    var activeSlide = slideEls[currentSlide];
+    var infoCard = activeSlide ? activeSlide.querySelector('.glass-info') : null;
+    if (infoCard) {
+      var rect = infoCard.getBoundingClientRect();
+      region.style.left = rect.left + 'px';
+      region.style.width = rect.width + 'px';
+      region.style.top = '12%';
+    }
+    var toast = document.createElement('div');
+    toast.className = 'glass-toast';
+    toast.style.width = '100%';
+    toast.innerHTML = '<div class="glass-toast__icon">\u2713</div>' +
+      '<div class="glass-toast__body">' +
+        '<div class="glass-toast__title">+' + formatEuro(amount) + '</div>' +
+        '<div class="glass-toast__desc">' + name + '</div>' +
+      '</div>';
+    region.appendChild(toast);
+    toast.addEventListener('animationend', function() { toast.remove(); }, { once: true });
   }
 
   // === Slide switcher ===
   const slideIds = ['slide-revenue', 'slide-distribution', 'slide-batterij', 'slide-zonne', 'slide-warmte'];
-  const slideEls = slideIds.map(id => document.getElementById(id));
+  const slideEls = slideIds.map(function(id) { return document.getElementById(id); });
   let currentSlide = 0;
 
-  const indContainer = document.getElementById('indicators');
-  slideIds.forEach((_, i) => {
-    const d = document.createElement('div');
-    d.className = 'ind' + (i === 0 ? ' active' : '');
-    d.id = 'dot' + i;
-    d.addEventListener('click', () => goToSlide(i));
-    indContainer.appendChild(d);
+  // Stepper
+  var stepEls = document.querySelectorAll('.glass-step');
+  stepEls.forEach(function(step) {
+    step.querySelector('.glass-step__inner').addEventListener('click', function() {
+      goToSlide(parseInt(step.dataset.step));
+    });
   });
+
+  function revealSlide(slideEl) {
+    var items = slideEl.querySelectorAll('.clip-reveal > *');
+    items.forEach(function(el, idx) {
+      var parent = el.parentElement;
+      var isHeader = parent.closest('.space-y-2') !== null;
+      var isInfoBox = el.classList.contains('bg-slate-800/50') || el.querySelector('[id]') !== null;
+      var isContent = parent.closest('.space-y-2') === null && !isInfoBox;
+
+      // Header text: slide up, info box: fade from right, content: scale up
+      if (isHeader) {
+        el.style.transform = 'translateY(110%)';
+        el.style.opacity = '1';
+      } else if (isContent && idx === items.length - 1) {
+        el.style.transform = 'translateY(30px) scale(0.97)';
+        el.style.opacity = '0';
+      } else {
+        el.style.transform = 'translateX(40px)';
+        el.style.opacity = '0';
+      }
+
+      el.style.transition = 'none';
+      el.offsetHeight;
+      el.style.transition = 'transform 0.8s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.6s ease';
+      el.style.transitionDelay = (idx * 0.12) + 's';
+      el.style.transform = 'translateY(0) translateX(0) scale(1)';
+      el.style.opacity = '1';
+    });
+  }
+
+  function hideSlideItems(slideEl) {
+    var items = slideEl.querySelectorAll('.clip-reveal > *');
+    items.forEach(function(el) {
+      el.style.transition = 'none';
+      el.style.transform = 'translateY(110%)';
+      el.style.opacity = '0';
+    });
+  }
+
+  function updateStepper(activeIdx) {
+    stepEls.forEach(function(step, i) {
+      step.classList.remove('is-active', 'is-complete');
+      var node = step.querySelector('.glass-step__node');
+      if (i < activeIdx) {
+        step.classList.add('is-complete');
+        node.textContent = '\u2713';
+      } else if (i === activeIdx) {
+        step.classList.add('is-active');
+        node.textContent = String(i + 1);
+      } else {
+        node.textContent = String(i + 1);
+      }
+    });
+  }
 
   function goToSlide(i) {
     if (i === currentSlide) return;
-    document.getElementById('dot' + currentSlide).classList.remove('active');
     slideEls[currentSlide].classList.remove('active');
+    hideSlideItems(slideEls[currentSlide]);
     currentSlide = i;
     slideEls[currentSlide].classList.add('active');
-    document.getElementById('dot' + currentSlide).classList.add('active');
+    updateStepper(currentSlide);
+    revealSlide(slideEls[currentSlide]);
   }
 
   function switchSlide() {
@@ -959,6 +1140,7 @@
   }
 
   updateAll();
+  revealSlide(slideEls[0]);
   setInterval(updateAll, 5_000);
   setInterval(switchSlide, 15_000);
 </script>
