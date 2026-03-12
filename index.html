@@ -602,15 +602,27 @@
       remeha: 0, intergas: 0, hisense: 0,
     };
 
-    // Starting distribution — even across all brands, pick random products uniformly
+    // Starting distribution — ~65% batteries, ~5% solar, ~30% heat pumps
     const startRng = mulberry32(999);
+    const BAT_PRODUCTS = PRODUCTS.filter(p => p.cat === 'batterij');
+    const SOLAR_PRODUCTS = PRODUCTS.filter(p => p.cat === 'zonne');
+    const WP_PRODUCTS = PRODUCTS.filter(p => p.cat === 'warmte');
+    const batTarget = START * (0.63 + startRng() * 0.04);
+    const solTarget = START * (0.045 + startRng() * 0.015);
+    // warmte gets the rest
     let accumulated = 0;
+    while (cats.batterij < batTarget) {
+      const p = BAT_PRODUCTS[Math.floor(startRng() * BAT_PRODUCTS.length)];
+      cats.batterij += p.price; brands[p.brand] += p.price; accumulated += p.price;
+    }
+    while (cats.zonne < solTarget) {
+      const p = SOLAR_PRODUCTS[Math.floor(startRng() * SOLAR_PRODUCTS.length)];
+      cats.zonne += p.price; brands[p.brand] += p.price; accumulated += p.price;
+    }
     while (accumulated < START) {
-      const product = PRODUCTS[Math.floor(startRng() * PRODUCTS.length)];
-      if (accumulated + product.price > START + 25000) break;
-      cats[product.cat] += product.price;
-      brands[product.brand] += product.price;
-      accumulated += product.price;
+      const p = WP_PRODUCTS[Math.floor(startRng() * WP_PRODUCTS.length)];
+      if (accumulated + p.price > START + 25000) break;
+      cats.warmte += p.price; brands[p.brand] += p.price; accumulated += p.price;
     }
     const scale = START / (accumulated || 1);
     for (const c of Object.keys(cats)) cats[c] *= scale;
