@@ -770,7 +770,7 @@ tailwind.config = {
     warmte: GOAL * 0.20,
   };
 
-  const REF = new Date(2026, 2, 13, 9, 30, 0).getTime();
+  const REF = Date.now() - 2 * 60 * 60 * 1000;
 
   function mulberry32(seed) {
     return function() {
